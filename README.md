@@ -1,5 +1,6 @@
 # Elev8
-StarkHack project for ETHGlobal
+A platform to launch 🚀 coins on Starknet chain hassle free. <br>
+we handle all the technicalities of it, just with few simple clicks your token will be live on the market for trade.
 
 
 Contributors:
@@ -12,3 +13,7 @@ Contributors:
     </tr>
   </tbody>
 </table>
+
+## LICENSE
+
+[MIT](LICENSE)
