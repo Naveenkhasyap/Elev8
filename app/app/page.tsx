@@ -36,12 +36,16 @@ export default function Home() {
     //     </div>
     //   </section>
     // </main>
-    
+
     <main className="flex flex-col py-2 px-10">
       <Header />
+      <section className="flex justify-center items-center flex-col">
+        {" "}
+        hello there
+      </section>
       <video
         ref={bgRef}
-        autoPlay 
+        autoPlay
         loop
         muted
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
