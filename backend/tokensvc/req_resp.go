@@ -56,6 +56,11 @@ func decodeTokensListRequest(vars map[string]string) (any, error) {
 	return req, nil
 }
 
+type ErrorInfo struct {
+	Code    int    `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
+}
+
 func DecodeRequest[T DecodeTypes](ctx context.Context, r *http.Request) (interface{}, error) {
 	var request T
 	err := json.NewDecoder(r.Body).Decode(&request)

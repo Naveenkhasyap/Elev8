@@ -3,6 +3,8 @@ package tokensvc
 import (
 	"context"
 	"log/slog"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type TokenDataService interface {
@@ -34,8 +36,10 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 func (svc tokenDatasvc) FetchToken(ctx context.Context, ticker string) (TokenData, error) {
 	//Todo
 	res, err := svc.tokenRepo.Fetch(ctx, ticker)
-	if err != nil {
+	if err != nil && err == mongo.ErrNoDocuments {
 		slog.Error("error fetching token with ticker", ticker, "error:", err)
+		return TokenData{}, TokenNotFound
+	} else if err != nil {
 		return TokenData{}, err
 	}
 	return res, nil

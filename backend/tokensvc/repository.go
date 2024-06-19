@@ -2,7 +2,6 @@ package tokensvc
 
 import (
 	"context"
-	"errors"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -28,13 +27,19 @@ func NewTokenDatarepo(client *mongo.Client) TokenDatarepo {
 
 func (r repo) Store(ctx context.Context, tokenData CreateTokenReq) error {
 	collection := r.dbClient.Database("Assets").Collection("tokens")
+
+	err := collection.FindOne(ctx, bson.M{"ticker": tokenData.Ticker}).Decode(&tokenData)
+	if err == nil {
+		return TokenExists
+	}
+
 	res, err := collection.InsertOne(ctx, tokenData)
 	if err != nil {
 		return err
 	}
 	_, ok := res.InsertedID.(primitive.ObjectID)
 	if !ok {
-		return errors.New("error inserting")
+		return InsertError
 	}
 	return nil
 }
