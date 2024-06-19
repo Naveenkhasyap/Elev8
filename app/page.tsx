@@ -14,13 +14,29 @@ export default function Home() {
       symbol: "HULK",
       logo: "https://w0.peakpx.com/wallpaper/495/822/HD-wallpaper-hulk-marvel.jpg",
       price: 0.5,
+      description: "This token represents the Marvel Hulk ",
+      createdBy: "cdoc21",
+    },
+    {
+      name: "RedHulk",
+      symbol: "RULK",
+      logo: "https://images2.alphacoders.com/134/thumb-1920-1348343.jpeg",
+      price: 0.5,
       description: "This token represents the Marvel Hulk",
       createdBy: "cdoc21",
     },
     {
-      name: "Hulk",
-      symbol: "HULK",
-      logo: "https://w0.peakpx.com/wallpaper/495/822/HD-wallpaper-hulk-marvel.jpg",
+      name: "LOKI",
+      symbol: "LOKI",
+      logo: "https://c4.wallpaperflare.com/wallpaper/84/141/133/marvel-cinematic-universe-loki-tom-hiddleston-thor-ragnarok-wallpaper-preview.jpg",
+      price: 0.5,
+      description: "This token represents the Marvel Hulk",
+      createdBy: "cdoc21",
+    },
+    {
+      name: "Captain America",
+      symbol: "CAPTAIN",
+      logo: "https://c4.wallpaperflare.com/wallpaper/713/13/242/movies-marvel-cinematic-universe-marvel-comics-avengers-endgame-captain-america-hd-wallpaper-preview.jpg",
       price: 0.5,
       description: "This token represents the Marvel Hulk",
       createdBy: "cdoc21",
@@ -34,25 +50,25 @@ export default function Home() {
       createdBy: "cdoc21",
     },
     {
-      name: "Hulk",
-      symbol: "HULK",
-      logo: "https://w0.peakpx.com/wallpaper/495/822/HD-wallpaper-hulk-marvel.jpg",
+      name: "RedHulk",
+      symbol: "RULK",
+      logo: "https://images2.alphacoders.com/134/thumb-1920-1348343.jpeg",
       price: 0.5,
       description: "This token represents the Marvel Hulk",
       createdBy: "cdoc21",
     },
     {
-      name: "Hulk",
-      symbol: "HULK",
-      logo: "https://w0.peakpx.com/wallpaper/495/822/HD-wallpaper-hulk-marvel.jpg",
+      name: "LOKI",
+      symbol: "LOKI",
+      logo: "https://c4.wallpaperflare.com/wallpaper/84/141/133/marvel-cinematic-universe-loki-tom-hiddleston-thor-ragnarok-wallpaper-preview.jpg",
       price: 0.5,
       description: "This token represents the Marvel Hulk",
       createdBy: "cdoc21",
     },
     {
-      name: "Hulk",
-      symbol: "HULK",
-      logo: "https://w0.peakpx.com/wallpaper/495/822/HD-wallpaper-hulk-marvel.jpg",
+      name: "Captain America",
+      symbol: "CAPTAIN",
+      logo: "https://c4.wallpaperflare.com/wallpaper/713/13/242/movies-marvel-cinematic-universe-marvel-comics-avengers-endgame-captain-america-hd-wallpaper-preview.jpg",
       price: 0.5,
       description: "This token represents the Marvel Hulk",
       createdBy: "cdoc21",
@@ -65,29 +81,31 @@ export default function Home() {
     }
   }, []);
   return (
-    // <main className="">
-    //   <Header />
+    // <>
+    //     // <main className="">
+    // //   <Header />
 
-    //   <section className="flex justify-center items-center flex-col">
-    //     <strong> Start a new coin </strong>
+    // //   <section className="flex justify-center items-center flex-col">
+    // //     <strong> Start a new coin </strong>
 
-    //     <strong>Top coins</strong>
+    // //     <strong>Top coins</strong>
 
-    //     <div className="shadow-lg">
-    //       <CoinCart
-    //         capital={100}
-    //         createdBy="cdoc21"
-    //         description="this token is crated for fun"
-    //         image={
-    //           "https://pump.mypinata.cloud/ipfs/QmdWPWmGjoDVpacNw51dtetcHnJitWPkdAWDq3CrAiP4nt?img-width=128&img-dpr=2&img-onerror=redirect"
-    //         }
-    //         price={0.5}
-    //         title="Pepe coin"
-    //         symbol="PEPE"
-    //       />
-    //     </div>
-    //   </section>
-    // </main>
+    // //     <div className="shadow-lg">
+    // //       <CoinCart
+    // //         capital={100}
+    // //         createdBy="cdoc21"
+    // //         description="this token is crated for fun"
+    // //         image={
+    // //           "https://pump.mypinata.cloud/ipfs/QmdWPWmGjoDVpacNw51dtetcHnJitWPkdAWDq3CrAiP4nt?img-width=128&img-dpr=2&img-onerror=redirect"
+    // //         }
+    // //         price={0.5}
+    // //         title="Pepe coin"
+    // //         symbol="PEPE"
+    // //       />
+    // //     </div>
+    // //   </section>
+    // // </main>
+    // </>
 
     <main className="flex flex-col ">
       <Header />
