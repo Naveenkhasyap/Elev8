@@ -1,7 +1,15 @@
+"use client";
 import React from "react";
+
 import { Cryptocurrency, cryptocurrencies } from "./model";
+import { useRouter } from "next/navigation";
 
 const CryptoTable: React.FC = () => {
+  const router = useRouter();
+
+  const handleRowClick = (id: number) => {
+    router.push(`/crypto/${id}`);
+  };
   return (
     <div className="overflow-x-auto rounded">
       <table className="min-w-full bg-blue-900/10 rounded">
@@ -19,7 +27,11 @@ const CryptoTable: React.FC = () => {
         </thead>
         <tbody>
           {cryptocurrencies.map((crypto: Cryptocurrency) => (
-            <tr key={crypto.id} className="border-t-[0.4px] border-t-blue-950">
+            <tr
+              key={crypto.id}
+              className="border-t-[0.4px] border-t-blue-950 cursor-pointer"
+              onClick={() => handleRowClick(crypto.id)}
+            >
               <td className="py-2 px-4">{crypto.id}</td>
               <td className="py-2 px-4 flex items-center">
                 <img

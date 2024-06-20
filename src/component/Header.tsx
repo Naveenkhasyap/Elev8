@@ -1,4 +1,5 @@
-import { logo } from "@/utils/Images";
+import { logo } from "../utils/Images";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -26,6 +27,7 @@ function Header() {
         <button className="bg-tc py-2 rounded-full px-4 font-oswald">
           Connect Wallet
         </button>
+        <DynamicWidget />
       </section>
     </main>
   );
