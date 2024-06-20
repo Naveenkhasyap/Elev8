@@ -9,6 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/NethermindEth/starknet.go/rpc"
+	"github.com/gofiles/accounts"
+	"github.com/gofiles/contracts"
 	tokensvc "github.com/gofiles/tokensvc"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -23,13 +26,31 @@ func main() {
 		os.Exit(-1)
 	}
 
+	rpcClient, rpcerr := rpc.NewProvider(os.Getenv("RPC_URL"))
+	if rpcerr != nil {
+		slog.Error("error rpc init")
+		os.Exit(-1)
+	}
+
 	client, err := initMongoConnections(context.TODO())
 	if err != nil {
 		slog.Error("error mongo init")
 		os.Exit(-1)
 	}
 
-	tokenService := initTokenService(client)             //init service
+	account, err := initAccount(rpcClient)
+	if err != nil {
+		slog.Error("error account init")
+		os.Exit(-1)
+	}
+
+	deployer, err := initDeployer(rpcClient, account)
+	if err != nil {
+		slog.Error("error deployer init")
+		os.Exit(-1)
+	}
+
+	tokenService := initTokenService(client, deployer)   //init service
 	tokenHandler := tokensvc.NewHTTPServer(tokenService) //init handler
 
 	errs := make(chan error)
@@ -73,8 +94,18 @@ func initMongoConnections(ctx context.Context) (*mongo.Client, error) {
 	return client, nil
 }
 
-func initTokenService(client *mongo.Client) tokensvc.TokenDataService {
+func initTokenService(client *mongo.Client, deployer contracts.Deployer) tokensvc.TokenDataService {
 	repo := tokensvc.NewTokenDatarepo(client)
-	return tokensvc.NewTokenDataService(repo)
+	return tokensvc.NewTokenDataService(repo, deployer)
+}
 
+func initAccount(client *rpc.Provider) (accounts.IAccount, error) {
+	accountAddress := os.Getenv("ACCOUNT_ADDRESS")
+	privateKey := os.Getenv("PRIVATE_KEY")
+	return accounts.NewAccount(client, accountAddress, privateKey)
+}
+
+func initDeployer(client *rpc.Provider, la accounts.IAccount) (contracts.Deployer, error) {
+	contractAddress := os.Getenv("DEPLOYER_CONTRACT_ADDRESS")
+	return contracts.NewDeployer(contractAddress, client, la)
 }

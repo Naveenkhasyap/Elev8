@@ -2,7 +2,6 @@ package contracts
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/NethermindEth/juno/core/felt"
@@ -194,9 +193,6 @@ func (e *erc20) gasEstimate(ctx context.Context, la accounts.IAccount, txn rpc.I
 	if err != nil {
 		return nil, fmt.Errorf("gas estimate sign, error: %v", err)
 	}
-
-	b, _ := json.Marshal(txn)
-	fmt.Println(string(b))
 
 	estimate, esterr := gas.EstimateGas(ctx, e.client, &txn)
 	if esterr != nil {

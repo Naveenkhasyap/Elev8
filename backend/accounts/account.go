@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/big"
 
@@ -91,6 +92,10 @@ func (la *localAccount) SignAndInvokeV1Txn(ctx context.Context, txn rpc.InvokeTx
 	if err != nil {
 		return nil, fmt.Errorf("unable to sign the transaction, err: %v", err)
 	}
+
+	b, _ := json.Marshal(txn)
+	fmt.Println(string(b))
+
 	res, txnErr := la.account.AddInvokeTransaction(ctx, txn)
 	if txnErr != nil {
 		return nil, fmt.Errorf("add invoke txn error, err: %v", err)

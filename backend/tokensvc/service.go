@@ -2,8 +2,10 @@ package tokensvc
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
+	"github.com/gofiles/contracts"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -13,15 +15,17 @@ type TokenDataService interface {
 	UpdateToken(ctx context.Context, tokenData TokenData) error
 	SellToken(ctx context.Context, ticker string, owner_address string) error
 	FetchAllToken(ctx context.Context, skip int) ([]TokenData, error)
-
 }
+
 type tokenDatasvc struct {
 	tokenRepo TokenDatarepo
+	deployer  contracts.Deployer
 }
 
-func NewTokenDataService(repo TokenDatarepo) TokenDataService {
+func NewTokenDataService(repo TokenDatarepo, deployer contracts.Deployer) TokenDataService {
 	return &tokenDatasvc{
 		tokenRepo: repo,
+		deployer:  deployer,
 	}
 }
 
@@ -32,6 +36,18 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 		slog.Error("error while storing token ", tokenData.Ticker, "error:", err)
 		return err
 	}
+
+	res, err := svc.deployer.Launch(ctx, contracts.DeployerReq{
+		Name:      tokenData.Name,
+		Symbol:    tokenData.Ticker,
+		Recipient: "0x003e1daE972977e8C7229074059cdF8C33B118B51FEeFd043d3b066551e2EC91",
+	})
+
+	if err != nil {
+		return fmt.Errorf("unable to deploy contract, err: %v", err)
+	}
+
+	fmt.Println(res.String())
 
 	return nil
 }
