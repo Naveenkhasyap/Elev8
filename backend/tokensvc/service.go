@@ -13,6 +13,7 @@ type TokenDataService interface {
 	UpdateToken(ctx context.Context, tokenData TokenData) error
 	SellToken(ctx context.Context, ticker string, owner_address string) error
 	FetchAllToken(ctx context.Context, skip int) ([]TokenData, error)
+
 }
 type tokenDatasvc struct {
 	tokenRepo TokenDatarepo
@@ -31,8 +32,10 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 		slog.Error("error while storing token ", tokenData.Ticker, "error:", err)
 		return err
 	}
+
 	return nil
 }
+
 func (svc tokenDatasvc) FetchToken(ctx context.Context, ticker string) (TokenData, error) {
 	//Todo
 	res, err := svc.tokenRepo.Fetch(ctx, ticker)
@@ -44,6 +47,7 @@ func (svc tokenDatasvc) FetchToken(ctx context.Context, ticker string) (TokenDat
 	}
 	return res, nil
 }
+
 func (svc tokenDatasvc) FetchAllToken(ctx context.Context, skip int) ([]TokenData, error) {
 	//Todo
 	res, err := svc.tokenRepo.FetchAll(ctx, skip)

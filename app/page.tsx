@@ -14,6 +14,7 @@ export default function Home() {
       symbol: "HULK",
       logo: "https://w0.peakpx.com/wallpaper/495/822/HD-wallpaper-hulk-marvel.jpg",
       price: 0.5,
+
       description: "This token represents the Marvel Hulk ",
       createdBy: "cdoc21",
     },
@@ -22,10 +23,12 @@ export default function Home() {
       symbol: "RULK",
       logo: "https://images2.alphacoders.com/134/thumb-1920-1348343.jpeg",
       price: 0.5,
+
       description: "This token represents the Marvel Hulk",
       createdBy: "cdoc21",
     },
     {
+
       name: "LOKI",
       symbol: "LOKI",
       logo: "https://c4.wallpaperflare.com/wallpaper/84/141/133/marvel-cinematic-universe-loki-tom-hiddleston-thor-ragnarok-wallpaper-preview.jpg",
@@ -81,6 +84,7 @@ export default function Home() {
     }
   }, []);
   return (
+
     // <>
     //     // <main className="">
     // //   <Header />

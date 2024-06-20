@@ -7,6 +7,7 @@ const nextConfig = {
       "images2.alphacoders.com",
       "c4.wallpaperflare.com",
     ],
+
   },
 };
 
