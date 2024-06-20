@@ -15,7 +15,7 @@ interface CartProp {
 }
 function Carts({ title, coins }: CartProp) {
   return (
-    <div className=" shadow-sm bg-gradient-to-t shadow-neutral-100  border-white  w-1/2 text-white rounded py-4">
+    <div className=" shadow-xs bg-blue-950/30 shadow-neutral-100    w-1/2 text-white rounded py-4">
       <strong className="flex justify-center text-xl">{title}</strong>
       <section>
         {coins?.map((coin) => (
