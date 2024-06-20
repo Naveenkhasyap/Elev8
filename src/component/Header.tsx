@@ -8,7 +8,7 @@ function Header() {
   return (
     <main className="flex  justify-between bg-black px-5  w-full sticky top-0 py-2 shadow-md z-50 border-b-[0.01px] border-tc">
       <div>
-        <section>
+        <section className="flex gap-5">
           <Image
             src={logo}
             alt="logo"
@@ -19,10 +19,14 @@ function Header() {
           />
         </section>
       </div>
-
-      <button className="bg-tc py-2 rounded-full px-4 font-oswald">
-        Connect Wallet
-      </button>
+      <section className="flex gap-5">
+        <button className="bg-white text-black rounded-full px-4 font-oswald py-2">
+          Launch Token
+        </button>
+        <button className="bg-tc py-2 rounded-full px-4 font-oswald">
+          Connect Wallet
+        </button>
+      </section>
     </main>
   );
 }
