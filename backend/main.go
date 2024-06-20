@@ -11,7 +11,6 @@ import (
 
 	tokensvc "github.com/gofiles/tokensvc"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -29,7 +28,6 @@ func main() {
 		slog.Error("error mongo init")
 		os.Exit(-1)
 	}
-
 
 	tokenService := initTokenService(client)             //init service
 	tokenHandler := tokensvc.NewHTTPServer(tokenService) //init handler
@@ -74,7 +72,6 @@ func initMongoConnections(ctx context.Context) (*mongo.Client, error) {
 	}
 	return client, nil
 }
-
 
 func initTokenService(client *mongo.Client) tokensvc.TokenDataService {
 	repo := tokensvc.NewTokenDatarepo(client)

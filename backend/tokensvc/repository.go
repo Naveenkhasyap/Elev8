@@ -3,8 +3,6 @@ package tokensvc
 import (
 	"context"
 
-	"errors"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,7 +14,6 @@ type TokenDatarepo interface {
 	Fetch(ctx context.Context, ticker string) (TokenData, error)
 	Update(ctx context.Context, ticker string, tokenData TokenData) error
 	FetchAll(ctx context.Context, skip int) ([]TokenData, error)
-
 }
 type repo struct {
 	dbClient *mongo.Client
@@ -28,7 +25,6 @@ func NewTokenDatarepo(client *mongo.Client) TokenDatarepo {
 	}
 }
 
-
 func (r repo) Store(ctx context.Context, tokenData CreateTokenReq) error {
 	collection := r.dbClient.Database("Assets").Collection("tokens")
 
@@ -36,7 +32,6 @@ func (r repo) Store(ctx context.Context, tokenData CreateTokenReq) error {
 	if err == nil {
 		return TokenExists
 	}
-
 
 	res, err := collection.InsertOne(ctx, tokenData)
 	if err != nil {
@@ -58,7 +53,6 @@ func (r repo) Fetch(ctx context.Context, ticker string) (TokenData, error) {
 	}
 	return tokenData, err
 }
-
 
 func (r repo) FetchAll(ctx context.Context, skip int) ([]TokenData, error) {
 	var tokenList = []TokenData{}
@@ -84,7 +78,6 @@ func (r repo) FetchAll(ctx context.Context, skip int) ([]TokenData, error) {
 	}
 	return tokenList, err
 }
-
 
 func (r repo) Update(ctx context.Context, ticker string, tokenData TokenData) error {
 	collection := r.dbClient.Database("Assets").Collection("tokens")
