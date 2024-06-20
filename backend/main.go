@@ -30,11 +30,13 @@ func main() {
 		os.Exit(-1)
 	}
 
-	imageSvc := initTokenService(client)
+
+	tokenService := initTokenService(client)             //init service
+	tokenHandler := tokensvc.NewHTTPServer(tokenService) //init handler
 
 	errs := make(chan error)
 	sm := http.NewServeMux()
-	sm.Handle("/token/create", imageSvc)
+	sm.Handle("/token/v1/", tokenHandler)
 
 	go func() {
 		c := make(chan os.Signal, 1)
@@ -73,29 +75,9 @@ func initMongoConnections(ctx context.Context) (*mongo.Client, error) {
 	return client, nil
 }
 
-func initTokenService(client *mongo.Client) http.Handler {
-	//Todo : move thos logic to service
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		collection := client.Database("Assets").Collection("tokens")
-		tokenData := tokensvc.TokenData{
-			Name:        "Token",
-			Ticker:      "TKN",
-			Description: "some meme token",
-			Image:       "fefref",
-		}
-		result, err := collection.InsertOne(context.TODO(), tokenData)
-		if err != nil {
-			slog.Error("some error ", err)
-		}
 
-		_, ok := result.InsertedID.(primitive.ObjectID)
-
-		if !ok {
-			slog.Error("NOT A VALID INSERT RESULT")
-		}
-
-		w.Write([]byte("Inserted token successfully "))
-	}
-	return http.HandlerFunc(fn)
+func initTokenService(client *mongo.Client) tokensvc.TokenDataService {
+	repo := tokensvc.NewTokenDatarepo(client)
+	return tokensvc.NewTokenDataService(repo)
 
 }
