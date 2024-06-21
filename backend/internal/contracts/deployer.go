@@ -7,9 +7,10 @@ import (
 	"github.com/NethermindEth/juno/core/felt"
 	"github.com/NethermindEth/starknet.go/rpc"
 	"github.com/NethermindEth/starknet.go/utils"
-	"github.com/gofiles/accounts"
-	"github.com/gofiles/gas"
-	"github.com/gofiles/helpers"
+	"github.com/gofiles/internal/accounts"
+	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
+	"github.com/gofiles/internal/gas"
+	"github.com/gofiles/internal/helpers"
 )
 
 type DeployerReq struct {
@@ -24,11 +25,11 @@ type Deployer interface {
 
 type deployer struct {
 	contractAddress *felt.Felt
-	client          *rpc.Provider
+	client          *starkrpc.Provider
 	localAccount    accounts.IAccount
 }
 
-func NewDeployer(contractAddress string, client *rpc.Provider, localAccount accounts.IAccount) (Deployer, error) {
+func NewDeployer(contractAddress string, client *starkrpc.Provider, localAccount accounts.IAccount) (Deployer, error) {
 	ca, err := utils.HexToFelt(contractAddress)
 	if err != nil {
 		return nil, fmt.Errorf("invalid deployer contract address: %s, err: %v", contractAddress, err)

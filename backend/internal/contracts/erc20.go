@@ -8,8 +8,9 @@ import (
 	"github.com/NethermindEth/starknet.go/account"
 	"github.com/NethermindEth/starknet.go/rpc"
 	"github.com/NethermindEth/starknet.go/utils"
-	"github.com/gofiles/accounts"
-	"github.com/gofiles/gas"
+	"github.com/gofiles/internal/accounts"
+	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
+	"github.com/gofiles/internal/gas"
 	"github.com/holiman/uint256"
 )
 
@@ -24,11 +25,11 @@ type IERC20 interface {
 }
 
 type erc20 struct {
-	client       *rpc.Provider
+	client       *starkrpc.Provider
 	tokenAccount *felt.Felt
 }
 
-func NewERC20(client *rpc.Provider, tokenAccount string) (IERC20, error) {
+func NewERC20(client *starkrpc.Provider, tokenAccount string) (IERC20, error) {
 	token, err := utils.HexToFelt(tokenAccount)
 	if err != nil {
 		return &erc20{}, fmt.Errorf("invalid token address, err: %v", err)

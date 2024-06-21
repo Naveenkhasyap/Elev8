@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/gofiles/contracts"
+	"github.com/gofiles/internal/contracts"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -30,7 +30,6 @@ func NewTokenDataService(repo TokenDatarepo, deployer contracts.Deployer) TokenD
 }
 
 func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenReq) error {
-	//Todo
 	err := svc.tokenRepo.Store(ctx, tokenData)
 	if err != nil {
 		slog.Error("error while storing token ", tokenData.Ticker, "error:", err)

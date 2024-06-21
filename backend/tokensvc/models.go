@@ -3,14 +3,16 @@ package tokensvc
 import "errors"
 
 type TokenData struct {
-	Name          string `json:"name" bson:"name"`
-	Ticker        string `json:"ticker" bson:"ticker"`
-	Description   string `json:"description" bson:"description"`
-	Image         string `json:"image" bson:"image"`
-	Twitter       string `json:"twitter,omitempty" bson:"twitter,omitempty"`
-	Telegram      string `json:"telegram,omitempty" bson:"telegram,omitempty"`
-	Website       string `json:"website,omitempty" bson:"website,omitempty"`
-	WalletAddress string `json:"wallet" bson:"wallet"`
+	Name            string `json:"name" bson:"name"`
+	Ticker          string `json:"ticker" bson:"ticker"`
+	Description     string `json:"description" bson:"description"`
+	Image           string `json:"image" bson:"image"`
+	Twitter         string `json:"twitter,omitempty" bson:"twitter,omitempty"`
+	Telegram        string `json:"telegram,omitempty" bson:"telegram,omitempty"`
+	Website         string `json:"website,omitempty" bson:"website,omitempty"`
+	WalletAddress   string `json:"wallet" bson:"wallet"`
+	Status          string `json:"status" bson:"status"`
+	TransactionHash string `json:"txnHash" bson:"txnHash"`
 }
 
 type GenericError struct {
@@ -33,4 +35,3 @@ var (
 	TokenExists           = errors.New("token already exists")
 	InsertError           = errors.New("error inserting")
 )
-

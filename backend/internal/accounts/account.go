@@ -11,6 +11,7 @@ import (
 	"github.com/NethermindEth/starknet.go/curve"
 	"github.com/NethermindEth/starknet.go/rpc"
 	"github.com/NethermindEth/starknet.go/utils"
+	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
 )
 
 type IAccount interface {
@@ -23,12 +24,12 @@ type IAccount interface {
 
 type localAccount struct {
 	accountAddress string
-	client         *rpc.Provider
+	client         *starkrpc.Provider
 	publicKey      *felt.Felt
 	account        *account.Account
 }
 
-func NewAccount(client *rpc.Provider, accountAddress string, privateKey string) (IAccount, error) {
+func NewAccount(client *starkrpc.Provider, accountAddress string, privateKey string) (IAccount, error) {
 	account_addr, err := utils.HexToFelt(accountAddress)
 	if err != nil {
 		return nil, fmt.Errorf("invalid address, err: %v", err)

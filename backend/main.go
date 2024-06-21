@@ -10,8 +10,9 @@ import (
 	"syscall"
 
 	"github.com/NethermindEth/starknet.go/rpc"
-	"github.com/gofiles/accounts"
-	"github.com/gofiles/contracts"
+	"github.com/gofiles/internal/accounts"
+	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
+	"github.com/gofiles/internal/contracts"
 	tokensvc "github.com/gofiles/tokensvc"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,17 +27,19 @@ func main() {
 		os.Exit(-1)
 	}
 
-	rpcClient, rpcerr := rpc.NewProvider(os.Getenv("RPC_URL"))
+	rpcx, rpcerr := rpc.NewProvider(os.Getenv("RPC_URL"))
 	if rpcerr != nil {
 		slog.Error("error rpc init")
 		os.Exit(-1)
 	}
 
+	rpcClient := initStarkRPC(os.Getenv("RPC_URL"), rpcx)
 	client, err := initMongoConnections(context.TODO())
 	if err != nil {
-		slog.Error("error mongo init")
+		slog.Error("error mongo init, ", err)
 		os.Exit(-1)
 	}
+	fmt.Println("mongo connection successful")
 
 	account, err := initAccount(rpcClient)
 	if err != nil {
@@ -99,13 +102,17 @@ func initTokenService(client *mongo.Client, deployer contracts.Deployer) tokensv
 	return tokensvc.NewTokenDataService(repo, deployer)
 }
 
-func initAccount(client *rpc.Provider) (accounts.IAccount, error) {
+func initStarkRPC(url string, client *rpc.Provider) *starkrpc.Provider {
+	return starkrpc.NewProvider(url, client)
+}
+
+func initAccount(client *starkrpc.Provider) (accounts.IAccount, error) {
 	accountAddress := os.Getenv("ACCOUNT_ADDRESS")
 	privateKey := os.Getenv("PRIVATE_KEY")
 	return accounts.NewAccount(client, accountAddress, privateKey)
 }
 
-func initDeployer(client *rpc.Provider, la accounts.IAccount) (contracts.Deployer, error) {
+func initDeployer(client *starkrpc.Provider, la accounts.IAccount) (contracts.Deployer, error) {
 	contractAddress := os.Getenv("DEPLOYER_CONTRACT_ADDRESS")
 	return contracts.NewDeployer(contractAddress, client, la)
 }
