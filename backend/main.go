@@ -36,7 +36,7 @@ func main() {
 	rpcClient := initStarkRPC(os.Getenv("RPC_URL"), rpcx)
 	client, err := initMongoConnections(context.TODO())
 	if err != nil {
-		slog.Error("error mongo init, ", err)
+		slog.Error("error mongo init", err)
 		os.Exit(-1)
 	}
 	fmt.Println("mongo connection successful")
@@ -70,14 +70,12 @@ func main() {
 		errs <- http.ListenAndServe(":8080", sm)
 	}()
 
-	select {
-	case _, ok := <-errs:
-		if ok {
-			slog.Error("errs", "error from Server")
-			os.Exit(-1)
-		} else {
-			slog.Error("errs", "exit channel empty")
-		}
+	err, ok := <-errs
+	if ok {
+		slog.Error("error from Server", err)
+		os.Exit(-1)
+	} else {
+		slog.Error("exit channel empty", err)
 	}
 
 }

@@ -22,6 +22,7 @@ type CreateTokenReq struct {
 	Telegram           string `json:"telegram,omitempty" bson:"telegram,omitempty"`
 	Website            string `json:"website,omitempty" bson:"website,omitempty"`
 	UserAccountAddress string `json:"userAccountAddress" bson:"userAccountAddress"`
+	Status             string `json:"status" bson:"status"`
 }
 
 type CreateTokenRes struct {
@@ -36,6 +37,16 @@ type CreateTokenResp struct {
 	Success bool `json:"sucess" bson:"sucess"`
 }
 
+type OrderDataReq struct {
+	Ticker       string `json:"ticker" bson:"ticker"`
+	Quantity     string `json:"quantity" bson:"quantity"`
+	BuyerAddress string `json:"buyerAddress" bson:"buyerAddress"`
+	OrderType    string `json:"orderType" bson:"orderType"`
+	IsOwner      bool   `json:"isOwner" bson:"isOwner"`
+}
+type OrderDataRes struct {
+	Success bool `json:"sucess" bson:"sucess"`
+}
 type Response struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message,omitempty"`
@@ -47,8 +58,23 @@ type TickerReq struct {
 	Ticker string `json:"ticker"`
 }
 
+type FetchOrderByUserReq struct {
+	UserAccountAddress string `json:"userAccountAddress" bson:"userAccountAddress"`
+}
+
+type BuySellTokenReq struct {
+	Ticker             string `json:"ticker" bson:"ticker"`
+	Quantity           string `json:"quantity" bson:"quantity"`
+	UserAccountAddress string `json:"userAccountAddress" bson:"userAccountAddress"`
+	OrderType          string `json:"orderType" bson:"orderType"`
+}
+
+type BuyTokenRes struct {
+	Success bool `json:"sucess" bson:"sucess"`
+}
+
 type DecodeTypes interface {
-	TickerReq | CreateTokenReq | TokensListRequest
+	TickerReq | CreateTokenReq | TokensListRequest | BuySellTokenReq | OrderDataReq
 }
 
 func decodeTokensListRequest(vars map[string]string) (any, error) {

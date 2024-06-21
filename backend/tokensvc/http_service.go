@@ -1,6 +1,5 @@
 package tokensvc
 
-
 import (
 	"context"
 	"encoding/json"
@@ -36,6 +35,34 @@ func NewHTTPServer(srv TokenDataService) http.Handler {
 		httptransport.EncodeJSONResponse,
 		serverOptions...,
 	))
+
+	r.Methods("GET").Path("/token/v1/buy").Handler(httptransport.NewServer(
+		endpoints.buyTokenEndpoint,
+		DecodeRequest[BuySellTokenReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("GET").Path("/token/v1/sell").Handler(httptransport.NewServer(
+		endpoints.sellTokenEndpoint,
+		DecodeRequest[BuySellTokenReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/fetch/order").Handler(httptransport.NewServer(
+		endpoints.fetchOrdersEndpoint,
+		DecodeRequest[OrderDataReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("GET").Path("/token/v1/fetch/allorders/{skip}").Handler(httptransport.NewServer(
+		endpoints.fetchAllOrdersEndpoint,
+		DecodePathParams(validate, decodeTokensListRequest),
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
 	return r
 }
 
@@ -58,7 +85,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 			Code:    400,
 			Message: InsertError.Error(),
 		}
-	} else if err == BadRequest {
+	} else if err == BadRequest || err == DeployError {
 		w.WriteHeader(http.StatusBadRequest)
 		errInfo = ErrorInfo{
 			Code:    400,
