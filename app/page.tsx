@@ -1,11 +1,12 @@
 "use client";
 import Header from "../src/component/Header";
 import { useEffect, useRef } from "react";
-import Carts from "../src/component/Carts";
-import CryptoTable from "../src/component/cryptoTable/CryptoTable";
+import Carts from "@/component/Carts";
+import CryptoTable from "@/component/cryptoTable/CryptoTable";
 
 export default function Home() {
   const bgRef = useRef<HTMLVideoElement>(null);
+
 
   const largestGainer = [
     {

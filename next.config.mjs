@@ -8,6 +8,7 @@ const nextConfig = {
       "c4.wallpaperflare.com",
       "assets.coingecko.com",
     ],
+
   },
 };
 

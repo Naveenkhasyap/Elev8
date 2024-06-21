@@ -33,3 +33,4 @@ var (
 	TokenExists           = errors.New("token already exists")
 	InsertError           = errors.New("error inserting")
 )
+
