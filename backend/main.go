@@ -53,8 +53,8 @@ func main() {
 		os.Exit(-1)
 	}
 
-	tokenService := initTokenService(client, deployer)   //init service
-	tokenHandler := tokensvc.NewHTTPServer(tokenService) //init handler
+	tokenService := initTokenService(client, deployer, rpcClient) //init service
+	tokenHandler := tokensvc.NewHTTPServer(tokenService)          //init handler
 
 	errs := make(chan error)
 	sm := http.NewServeMux()
@@ -97,9 +97,9 @@ func initMongoConnections(ctx context.Context) (*mongo.Client, error) {
 	return client, nil
 }
 
-func initTokenService(client *mongo.Client, deployer contracts.Deployer) tokensvc.TokenDataService {
+func initTokenService(client *mongo.Client, deployer contracts.Deployer, rpc *starkrpc.Provider) tokensvc.TokenDataService {
 	repo := tokensvc.NewTokenDatarepo(client)
-	return tokensvc.NewTokenDataService(repo, deployer)
+	return tokensvc.NewTokenDataService(repo, deployer, rpc)
 }
 
 func initStarkRPC(url string, client *rpc.Provider) *starkrpc.Provider {

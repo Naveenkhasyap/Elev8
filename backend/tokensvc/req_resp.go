@@ -14,14 +14,22 @@ import (
 )
 
 type CreateTokenReq struct {
-	Name          string `json:"name" bson:"name"`
-	Ticker        string `json:"ticker" bson:"ticker"`
-	Description   string `json:"description" bson:"description"`
-	Image         string `json:"image" bson:"image"`
-	Twitter       string `json:"twitter,omitempty" bson:"twitter,omitempty"`
-	Telegram      string `json:"telegram,omitempty" bson:"telegram,omitempty"`
-	Website       string `json:"website,omitempty" bson:"website,omitempty"`
-	WalletAddress string `json:"wallet" bson:"wallet"`
+	Name               string `json:"name" bson:"name"`
+	Ticker             string `json:"ticker" bson:"ticker"`
+	Description        string `json:"description" bson:"description"`
+	Image              string `json:"image" bson:"image"`
+	Twitter            string `json:"twitter,omitempty" bson:"twitter,omitempty"`
+	Telegram           string `json:"telegram,omitempty" bson:"telegram,omitempty"`
+	Website            string `json:"website,omitempty" bson:"website,omitempty"`
+	UserAccountAddress string `json:"userAccountAddress" bson:"userAccountAddress"`
+}
+
+type CreateTokenRes struct {
+	Name               string `json:"name"`
+	Ticker             string `json:"ticker"`
+	UserAccountAddress string `json:"userAccountAddress"`
+	TxnHash            string `json:"txnHash"`
+	Status             string `json:"status"`
 }
 
 type CreateTokenResp struct {
