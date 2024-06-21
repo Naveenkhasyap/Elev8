@@ -7,8 +7,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
+	"time"
 
+	"github.com/NethermindEth/juno/core/felt"
 	"github.com/NethermindEth/starknet.go/rpc"
 	"github.com/gofiles/internal/accounts"
 	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
@@ -17,6 +20,7 @@ import (
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func main() {
@@ -70,6 +74,22 @@ func main() {
 		errs <- http.ListenAndServe(":8080", sm)
 	}()
 
+	ticker := time.NewTicker(10 * time.Second)
+	quit := make(chan struct{})
+	//poll orders
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				pollOrderforStatus(context.TODO(), client, rpcClient)
+			case <-quit:
+				ticker.Stop()
+				return
+			}
+		}
+
+	}()
+
 	err, ok := <-errs
 	if ok {
 		slog.Error("error from Server", err)
@@ -78,6 +98,42 @@ func main() {
 		slog.Error("exit channel empty", err)
 	}
 
+}
+
+func pollOrderforStatus(ctx context.Context, client *mongo.Client, rpcClient *starkrpc.Provider) {
+	slog.Info("msg", "polling orders")
+	tokenCollection := client.Database("Assets").Collection("tokens")
+	cursor, err := tokenCollection.Find(ctx, bson.M{"status": bson.M{"$eq": ""}})
+	if err != nil {
+		slog.Error("err in finding poll data", err)
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var mode tokensvc.TokenData
+		err1 := cursor.Decode(&mode)
+		if err1 != nil {
+			continue
+		}
+
+		hash, err := new(felt.Felt).SetString(mode.TransactionHash)
+		if err != nil {
+			slog.Error("error converting hash to felt", err)
+		}
+		resp, _ := rpcClient.GetTransactionStatus(ctx, hash)
+		slog.Info("Transaction status", resp)
+
+		if !strings.EqualFold(string(resp.FinalityStatus), mode.Status) {
+			_, err := tokenCollection.UpdateOne(ctx, bson.M{"ticker": bson.M{"$eq": mode.Ticker}},
+				bson.M{"$set": bson.M{
+					"status": string(resp.FinalityStatus),
+				}})
+			if err != nil {
+				slog.Error("error updating status in go routine", err)
+			}
+		}
+
+	}
 }
 
 func initMongoConnections(ctx context.Context) (*mongo.Client, error) {
