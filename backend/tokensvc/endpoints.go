@@ -32,7 +32,7 @@ func makecreateTokenEndpoint(s TokenDataService) endpoint.Endpoint {
 			}
 		}
 
-		err := s.CreateToken(ctx, req)
+		_, err := s.CreateToken(ctx, req)
 		success := err == nil
 		return Response{
 			Success: success,
