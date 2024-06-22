@@ -2,9 +2,14 @@
 import { useParams } from "next/navigation";
 import { cryptocurrencies } from "../../../src/component/cryptoTable/model";
 import Header from "@/component/header/Header";
+import TradingViewWidget from "@/component/cryptoDetail/TradingViewWidget";
 
 const CryptoDetail = () => {
-  const params = useParams();
+  const params = useParams<{ id: string }>();
+  if (!params || !params.id) {
+    return <div>No ID available</div>;
+  }
+
   const { id } = params;
 
   const crypto = cryptocurrencies.find((c) => c.id.toString() === id);
@@ -24,6 +29,7 @@ const CryptoDetail = () => {
         <p>Market Cap: {crypto.marketCap}</p>
         <p>Volume: {crypto.volume}</p>
         <img src={`/charts/${crypto.chart}`} alt={`Chart of ${crypto.name}`} />
+        <TradingViewWidget symbol="" />
       </div>
     </>
   );
