@@ -29,7 +29,7 @@ const CryptoDetail = () => {
         <p>Market Cap: {crypto.marketCap}</p>
         <p>Volume: {crypto.volume}</p>
         <img src={`/charts/${crypto.chart}`} alt={`Chart of ${crypto.name}`} />
-        <TradingViewWidget symbol="" />
+        <TradingViewWidget />
       </div>
     </>
   );

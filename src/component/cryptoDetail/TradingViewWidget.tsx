@@ -1,67 +1,54 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Script from "next/script";
 
-declare global {
-  interface Window {
-    TradingView: any;
-  }
+interface CustomWindow extends Window {
+  TradingView: any;
+  Datafeeds: any;
 }
 
-interface TradingViewWidgetProps {
-  symbol: string;
-}
-
-const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ symbol }) => {
-  const widgetRef = useRef<HTMLDivElement | null>(null);
+const TradingViewWidget = () => {
+  const widgetRef = useRef<HTMLDivElement>(null);
+  const [scriptsLoaded, setScriptsLoaded] = useState(false);
 
   useEffect(() => {
-    if (widgetRef.current) {
-      const script = document.createElement("script");
-      script.src =
-        // "../../../charting_library-master/charting_library/charting_library.standalone.js";
-      script.src =
-        "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-      script.async = true;
-      script.onload = () => {
-        console.log("TradingView script loaded");
-        new window.TradingView.widget({
-          container_id: widgetRef.current!,
-          width: "100%",
-          height: "100%",
-          // symbol: symbol,
-          symbol: "AAPL",
-          locale: "en",
-          fullscreen: true,
-          interval: "D",
-          timezone: "Etc/UTC",
-          library_path: "../../../charting_library-master/charting_library",
-          theme: "dark",
-          style: "1",
-          toolbar_bg: "#f1f3f6",
-          enable_publishing: false,
-          allow_symbol_change: true,
-          hide_side_toolbar: false,
-          details: true,
-          hotlist: true,
-          calendar: true,
-        });
-      };
-      script.onerror = () => {
-        console.error("Error loading TradingView script");
-      };
-      widgetRef.current.appendChild(script);
+    if (!scriptsLoaded) return;
 
-      return () => {
-        widgetRef.current!.innerHTML = "";
-      };
+    if (widgetRef.current) {
+      (window as CustomWindow).TradingView.widget({
+        container_id: widgetRef.current!,
+        locale: "en",
+        library_path: "/charting_library-master/charting_library/",
+        datafeed: new (window as CustomWindow).Datafeeds.UDFCompatibleDatafeed(
+          "https://demo-feed-data.tradingview.com"
+        ),
+        symbol: "AAPL",
+        interval: "1D",
+        fullscreen: true,
+        debug: true,
+      });
     }
-  }, [symbol]);
+  }, [scriptsLoaded]);
 
   return (
-    <div
-      ref={widgetRef}
-      style={{ border: "1px solid red " }}
-      className="w-full h-screen"
-    />
+    <>
+      <Script
+        src="/charting_library-master/datafeeds/udf/dist/bundle.js"
+        strategy="afterInteractive"
+      />
+      <Script
+        src="/charting_library-master/charting_library/charting_library.standalone.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          setScriptsLoaded(true);
+        }}
+      />
+      {scriptsLoaded && (
+        <div
+          ref={widgetRef}
+          style={{ border: "1px solid red ", width: "100%", height: "600px" }}
+        />
+      )}
+    </>
   );
 };
 
