@@ -1,5 +1,5 @@
-"use client";
 import { createToken } from "@/utils/apis";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 
@@ -9,8 +9,7 @@ const Modal = ({ onClose, setSuccess }: any) => {
   const [ticker, setTicker] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [image, setImage] = useState("");
-  const [wallet, setWallet] = useState<string>("");
-
+  const { primaryWallet } = useDynamicContext();
   const inputStyle = `w-full px-4 py-2 mb-4 text-white bg-blue-800/30 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500`;
 
   const handleClose = () => {
@@ -26,7 +25,7 @@ const Modal = ({ onClose, setSuccess }: any) => {
       ticker,
       description,
       image,
-      wallet,
+      wallet: primaryWallet?.address,
     });
     if (response?.data.success == true) {
       setIsClosing(true);
@@ -43,7 +42,7 @@ const Modal = ({ onClose, setSuccess }: any) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result?.toString().split(",")[1];
-        setImage(base64String || ""); // Use empty string as fallback
+        setImage(base64String || "");
       };
       reader.readAsDataURL(file);
     }
@@ -57,9 +56,8 @@ const Modal = ({ onClose, setSuccess }: any) => {
       }`}
       onClick={handleClose}
     >
-      {/* {image && <RenderBase64Image />} */}
       <div
-        className={`bg-blue-900/50 relative px-2 py-2 rounded mt-4 shadow-lg max-w-[50rem] w-[30rem] mx-auto z-40 flex flex-col ${
+        className={`bg-blue-900/80 relative px-2 py-2 rounded mt-4 shadow-lg max-w-[50rem] w-[30rem] mx-auto z-40 flex flex-col ${
           isClosing
             ? "motion-safe:animate-fade-out"
             : "motion-safe:animate-fade-in"
@@ -111,15 +109,7 @@ const Modal = ({ onClose, setSuccess }: any) => {
             className={inputStyle}
             onChange={handleImageChange}
           />
-          <input
-            type="text"
-            placeholder="Select logo"
-            className={inputStyle}
-            value={wallet}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setWallet(e.target.value)
-            }
-          />
+
           <button
             className="w-full px-4 py-2 mb-4 text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
             onClick={() => {

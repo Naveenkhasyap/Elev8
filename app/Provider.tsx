@@ -1,20 +1,12 @@
 "use client";
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { type ReactNode } from "react";
-import { WagmiProvider } from "wagmi";
+import { useEffect, type ReactNode } from "react";
 import { Provider } from "react-redux";
 import { store } from "../store/store";
-
-import { config } from "@/lib/wagmi";
-
+import { StarknetWalletConnectors } from "@dynamic-labs/starknet";
 import {
   DynamicContextProvider,
-  EthereumWalletConnectors,
-  DynamicWagmiConnector,
-} from "@/lib/dynamic";
-
-const queryClient = new QueryClient();
+  useUserWallets,
+} from "@dynamic-labs/sdk-react-core";
 
 export function Providers(props: { children: ReactNode }) {
   return (
@@ -22,14 +14,10 @@ export function Providers(props: { children: ReactNode }) {
       <DynamicContextProvider
         settings={{
           environmentId: "fe350575-4c7c-4297-aff2-9a3de9e5c479",
-          walletConnectors: [EthereumWalletConnectors],
+          walletConnectors: [StarknetWalletConnectors],
         }}
       >
-        <WagmiProvider config={config}>
-          <QueryClientProvider client={queryClient}>
-            <DynamicWagmiConnector>{props.children}</DynamicWagmiConnector>
-          </QueryClientProvider>
-        </WagmiProvider>
+        {props.children}
       </DynamicContextProvider>
     </Provider>
   );

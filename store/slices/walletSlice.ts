@@ -5,6 +5,7 @@ export interface initialStateI {
 }
 const initialState = {
   modelOpen: true,
+  walletAddress: "",
 };
 
 export const isMainSlice = createSlice({
@@ -13,6 +14,9 @@ export const isMainSlice = createSlice({
   reducers: {
     setIsModelOpen: (state, action) => {
       state.modelOpen = action.payload;
+    },
+    setWalletAddress: (state, action) => {
+      state.walletAddress = action.payload;
     },
   },
 });

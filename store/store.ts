@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { isMainSlice } from "./slices/exampleSlice";
+import { isMainSlice } from "./slices/walletSlice";
 
 export const store = configureStore({
   reducer: {
