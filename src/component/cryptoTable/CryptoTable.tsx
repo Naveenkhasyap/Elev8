@@ -1,27 +1,13 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const CryptoTable = ({ tokens }: any) => {
   const router = useRouter();
 
   const handleRowClick = (id: number) => {
     router.push(`/crypto/${id}`);
-  };
-
-  const base64ToBlob = (base64: string, type: string) => {
-    try {
-      const byteCharacters = atob(base64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      return new Blob([byteArray], { type });
-    } catch (error) {
-      console.error("Failed to convert base64 to Blob", error);
-      return null;
-    }
   };
 
   return (
@@ -38,12 +24,7 @@ const CryptoTable = ({ tokens }: any) => {
         </thead>
         <tbody>
           {tokens.map((crypto: any, index: number) => {
-            let imageUrl;
-            const blob = base64ToBlob(crypto.image, "image/jpeg");
-            if (blob) {
-              imageUrl = URL.createObjectURL(blob);
-            }
-
+            let imageUrl = `data:image/png;base64,${crypto.image}`;
             return (
               <tr
                 key={crypto.description}
@@ -65,10 +46,12 @@ const CryptoTable = ({ tokens }: any) => {
                 <td className="py-2 px-3">{crypto.price}</td>
                 <td className="py-2 px-3">{crypto.marketCap}</td>
                 <td className="py-2 px-3">
-                  <img
+                  <Image
                     src={"https://www.coingecko.com/coins/325/sparkline.svg"}
                     alt={`Chart of ${crypto.name}`}
                     className="w-16 h-8"
+                    width={100}
+                    height={100}
                   />
                 </td>
               </tr>

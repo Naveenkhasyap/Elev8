@@ -8,59 +8,16 @@ import { fetchTokens } from "@/utils/apis";
 export default function Home() {
   const bgRef = useRef<HTMLVideoElement>(null);
   const [tokens, setTokens] = useState([]);
-
-  const largestGainer = [
-    {
-      price: 1.05,
-      symbol: "Toshi",
-      icon: "https://assets.coingecko.com/coins/images/31126/standard/2023-08-11_13.21.24.png?1697025145",
-      currentState: true,
-      currentStateVal: 1.05,
-    },
-    {
-      price: 1.05,
-      symbol: "ZKsync",
-      icon: "https://assets.coingecko.com/coins/images/38043/standard/ZKTokenBlack.png?1718614502",
-      currentState: true,
-      currentStateVal: 1.05,
-    },
-    {
-      price: 1.05,
-      symbol: "LinqAI",
-      icon: "https://assets.coingecko.com/coins/images/35645/standard/cmc-cg-linq-logo_%282%29.png?1709368877",
-      currentState: false,
-      currentStateVal: 1.05,
-    },
-  ];
-  const treadingCoins = [
-    {
-      price: 1.05,
-      symbol: "Toshi",
-      icon: "https://assets.coingecko.com/coins/images/31126/standard/2023-08-11_13.21.24.png?1697025145",
-      currentState: true,
-      currentStateVal: 1.05,
-    },
-    {
-      price: 1.05,
-      symbol: "ZKsync",
-      icon: "https://assets.coingecko.com/coins/images/38043/standard/ZKTokenBlack.png?1718614502",
-      currentState: false,
-      currentStateVal: 1.05,
-    },
-    {
-      price: 1.05,
-      symbol: "LinqAI",
-      icon: "https://assets.coingecko.com/coins/images/35645/standard/cmc-cg-linq-logo_%282%29.png?1709368877",
-      currentState: true,
-      currentStateVal: 1.05,
-    },
-  ];
+  const [largestGainer, setLargestGainer] = useState([]);
+  const [treadingCoins, setTreadingCoins] = useState([]);
 
   const fetchData = async () => {
     try {
       const response = await fetchTokens();
       if (response && response.data !== undefined) {
         setTokens(response.data.data);
+        setLargestGainer(response.data.data.slice(0, 3));
+        setTreadingCoins(response.data.data.slice(3, 6));
       }
     } catch (error) {
       console.error("Error fetching tokens:", error);
@@ -68,12 +25,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // console.log(tokens, "tokens");
-  }, [tokens]);
-
-  useEffect(() => {
     fetchData();
-
     if (bgRef.current) {
       bgRef.current.playbackRate = 0.5;
     }
