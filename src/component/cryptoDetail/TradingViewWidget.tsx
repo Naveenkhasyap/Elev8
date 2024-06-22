@@ -13,20 +13,20 @@ const TradingViewWidget = () => {
   useEffect(() => {
     if (!scriptsLoaded) return;
 
-    if (widgetRef.current) {
-      (window as CustomWindow).TradingView.widget({
-        container_id: widgetRef.current!,
-        locale: "en",
-        library_path: "/charting_library-master/charting_library/",
-        datafeed: new (window as CustomWindow).Datafeeds.UDFCompatibleDatafeed(
-          "https://demo-feed-data.tradingview.com"
-        ),
-        symbol: "AAPL",
-        interval: "1D",
-        fullscreen: true,
-        debug: true,
-      });
-    }
+    // if (widgetRef.current) {
+    //   (window as CustomWindow).TradingView.widget({
+    //     container_id: widgetRef.current!,
+    //     locale: "en",
+    //     library_path: "/charting_library-master/charting_library/",
+    //     datafeed: new (window as CustomWindow).Datafeeds.UDFCompatibleDatafeed(
+    //       "https://demo-feed-data.tradingview.com"
+    //     ),
+    //     symbol: "AAPL",
+    //     interval: "1D",
+    //     fullscreen: true,
+    //     debug: true,
+    //   });
+    // }
   }, [scriptsLoaded]);
 
   return (
