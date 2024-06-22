@@ -17,9 +17,11 @@ type TokenData struct {
 	Status             string    `json:"status" bson:"status"`
 	TransactionHash    string    `json:"txnHash" bson:"txnHash"`
 	CreatedAt          time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at" bson:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at" bson:"updated_at"`
 	Change24hr         string    `json:"change24hr" bson:"change24hr"`
 	Change7day         string    `json:"change7day" bson:"change7day"`
+	Price              string    `json:"price" bson:"price"`
+	MarketCap          string    `json:"marketCap" bson:"marketcap"`
 }
 
 type OrderData struct {

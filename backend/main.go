@@ -110,26 +110,30 @@ func pollOrderforStatus(ctx context.Context, client *mongo.Client, rpcClient *st
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
+		slog.Info("msg", "looping now")
 		var mode tokensvc.TokenData
 		err1 := cursor.Decode(&mode)
 		if err1 != nil {
 			continue
 		}
-
-		hash, err := new(felt.Felt).SetString(mode.TransactionHash)
-		if err != nil {
-			slog.Error("error converting hash to felt", err)
-		}
-		resp, _ := rpcClient.GetTransactionStatus(ctx, hash)
-		slog.Info("Transaction status", resp)
-
-		if !strings.EqualFold(string(resp.FinalityStatus), mode.Status) {
-			_, err := tokenCollection.UpdateOne(ctx, bson.M{"ticker": bson.M{"$eq": mode.Ticker}},
-				bson.M{"$set": bson.M{
-					"status": string(resp.FinalityStatus),
-				}})
+		if mode.TransactionHash != "" {
+			hash, err := new(felt.Felt).SetString(mode.TransactionHash)
 			if err != nil {
-				slog.Error("error updating status in go routine", err)
+				slog.Error("error converting hash to felt", err)
+			}
+			resp, _ := rpcClient.GetTransactionStatus(ctx, hash)
+			slog.Info("Transaction status", resp)
+			if resp == nil {
+				continue
+			}
+			if !strings.EqualFold(string(resp.FinalityStatus), mode.Status) {
+				_, err := tokenCollection.UpdateOne(ctx, bson.M{"ticker": bson.M{"$eq": mode.Ticker}},
+					bson.M{"$set": bson.M{
+						"status": string(resp.FinalityStatus),
+					}})
+				if err != nil {
+					slog.Error("error updating status in go routine", err)
+				}
 			}
 		}
 

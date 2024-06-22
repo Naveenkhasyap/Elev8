@@ -59,8 +59,11 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 		Twitter:            tokenData.Telegram,
 		UserAccountAddress: tokenData.UserAccountAddress,
 		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 		Change24hr:         fmt.Sprintf("%f", 1+rand.Float64()*(30-1)),
 		Change7day:         fmt.Sprintf("%f", 1+rand.Float64()*(9-1)),
+		Price:              fmt.Sprintf("%f", 1+rand.Float64()*(30-1)),
+		MarketCap:          fmt.Sprintf("%d", 1+rand.Intn(1e9)),
 	}
 	err := svc.tokenRepo.Store(ctx, dbData)
 	if err != nil {
