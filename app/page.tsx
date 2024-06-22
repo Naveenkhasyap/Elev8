@@ -1,14 +1,13 @@
 "use client";
 import Header from "../src/component/header/Header";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Carts from "@/component/cart/Carts";
 import CryptoTable from "@/component/cryptoTable/CryptoTable";
-import { useDispatch, useSelector } from "react-redux";
+import { fetchTokens } from "@/utils/apis";
 
 export default function Home() {
   const bgRef = useRef<HTMLVideoElement>(null);
-  const dispatch = useDispatch();
-  const { modelOpen } = useSelector((state: any) => state.MainSlice);
+  const [tokens, setTokens] = useState([]);
 
   const largestGainer = [
     {
@@ -57,7 +56,24 @@ export default function Home() {
     },
   ];
 
+  const fetchData = async () => {
+    try {
+      const response = await fetchTokens();
+      if (response && response.data !== undefined) {
+        setTokens(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching tokens:", error);
+    }
+  };
+
   useEffect(() => {
+    // console.log(tokens, "tokens");
+  }, [tokens]);
+
+  useEffect(() => {
+    fetchData();
+
     if (bgRef.current) {
       bgRef.current.playbackRate = 0.5;
     }
@@ -65,7 +81,6 @@ export default function Home() {
   return (
     <main>
       <Header />
-
 
       <div className="px-10">
         <section className="flex flex-col py-15">
@@ -76,7 +91,7 @@ export default function Home() {
         </section>
 
         <section className="mt-10">
-          <CryptoTable />
+          <CryptoTable tokens={tokens} />
         </section>
       </div>
     </main>

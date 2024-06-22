@@ -13,3 +13,12 @@ export const createToken = async (data: any) => {
     console.log(err);
   }
 };
+
+export const fetchTokens = async () => {
+  try {
+    const response = await nextClient.post("fetch-tokens");
+    return response;
+  } catch (err) {
+    console.log(err);
+  }
+};

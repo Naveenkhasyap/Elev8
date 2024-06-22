@@ -1,9 +1,5 @@
 "use client";
-
-import { celebrate } from "@/utils/Images";
 import { createToken } from "@/utils/apis";
-import SvgComponent from "@/utils/celebrate";
-import Image from "next/image";
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 
@@ -32,7 +28,7 @@ const Modal = ({ onClose, setSuccess }: any) => {
       image,
       wallet,
     });
-    if (response?.data.success==true) {
+    if (response?.data.success == true) {
       setIsClosing(true);
       setTimeout(() => {
         onClose(false);
@@ -41,6 +37,17 @@ const Modal = ({ onClose, setSuccess }: any) => {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result?.toString().split(",")[1];
+        setImage(base64String || ""); // Use empty string as fallback
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   return (
     <div
       className={`fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-30  ${
@@ -50,6 +57,7 @@ const Modal = ({ onClose, setSuccess }: any) => {
       }`}
       onClick={handleClose}
     >
+      {/* {image && <RenderBase64Image />} */}
       <div
         className={`bg-blue-900/50 relative px-2 py-2 rounded mt-4 shadow-lg max-w-[50rem] w-[30rem] mx-auto z-40 flex flex-col ${
           isClosing
@@ -101,10 +109,7 @@ const Modal = ({ onClose, setSuccess }: any) => {
             type="file"
             placeholder="Select logo"
             className={inputStyle}
-            value={image}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setImage(e.target.value)
-            }
+            onChange={handleImageChange}
           />
           <input
             type="text"
