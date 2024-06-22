@@ -1,12 +1,16 @@
 "use client";
-import Header from "../src/component/Header";
+import Header from "../src/component/header/Header";
 import { useEffect, useRef } from "react";
-import Carts from "@/component/Carts";
+import Carts from "@/component/cart/Carts";
 import CryptoTable from "@/component/cryptoTable/CryptoTable";
+import Model from "@/component/model/Model";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsModelOpen } from "../store/slices/exampleSlice";
 
 export default function Home() {
   const bgRef = useRef<HTMLVideoElement>(null);
-
+  const dispatch = useDispatch();
+  const { modelOpen } = useSelector((state: any) => state.MainSlice);
 
   const largestGainer = [
     {
@@ -63,6 +67,8 @@ export default function Home() {
   return (
     <main>
       <Header />
+
+
       <div className="px-10">
         <section className="flex flex-col py-15">
           <div className="flex  justify-between w-full gap-5 mt-24">
