@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-
 import { useRouter } from "next/navigation";
 
 const CryptoTable = ({ tokens }: any) => {
@@ -24,16 +23,17 @@ const CryptoTable = ({ tokens }: any) => {
       return null;
     }
   };
+
   return (
     <div className="overflow-x-auto rounded">
       <table className="min-w-full bg-blue-900/10 rounded">
         <thead className="bg-blue-900/20">
           <tr>
-            <th className="py-2 px-1">#</th>
-            <th className="py-2 px-4">Name</th>
-            <th className="py-2 px-4">Price</th>
-            <th className="py-2 px-4">Market Cap</th>
-            <th className="py-2 px-4">Chart</th>
+            <th className="py-2 px-3 text-left">#</th>
+            <th className="py-2 px-3 text-left">Name</th>
+            <th className="py-2 px-3 text-left">Price</th>
+            <th className="py-2 px-3 text-left">Market Cap</th>
+            <th className="py-2 px-3 text-left">Chart</th>
           </tr>
         </thead>
         <tbody>
@@ -50,21 +50,21 @@ const CryptoTable = ({ tokens }: any) => {
                 className="border-t-[0.4px] border-t-blue-950 cursor-pointer"
                 onClick={() => handleRowClick(crypto.id)}
               >
-                <td className="py-2 px-7">{index + 1}</td>
-                <td className="py-2 px-4 flex items-center">
+                <td className="py-2 px-3">{index + 1}</td>
+                <td className="py-2 px-3 flex items-center">
                   <img
                     src={imageUrl}
                     alt={crypto.name}
                     className="w-6 h-6 mr-2 rounded-full"
                   />
                   {crypto.name}
-                  <span className="ml-1 text-gray-200 text-sm`">
+                  <span className="ml-1 text-gray-200 text-sm">
                     {crypto.symbol}
                   </span>
                 </td>
-                <td className="py-2 px-4">{crypto.price}</td>
-                <td className="py-2 px-4">{crypto.marketCap}</td>
-                <td className="py-2 px-4">
+                <td className="py-2 px-3">{crypto.price}</td>
+                <td className="py-2 px-3">{crypto.marketCap}</td>
+                <td className="py-2 px-3">
                   <img
                     src={"https://www.coingecko.com/coins/325/sparkline.svg"}
                     alt={`Chart of ${crypto.name}`}
