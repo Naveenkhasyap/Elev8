@@ -73,8 +73,21 @@ type BuyTokenRes struct {
 	Success bool `json:"sucess" bson:"sucess"`
 }
 
+type QuoteReq struct {
+	TokenAddress string `json:"tokenAddress" bson:"tokenAddress"`
+	Amount       string `json:"amount" bson:"amount"`
+}
+
+type OwnerReq struct {
+	TokenAddress string `json:"tokenAddress" bson:"tokenAddress"`
+}
+
+type BalaceReq struct {
+	TokenAddress string `json:"tokenAddress" bson:"tokenAddress"`
+}
+
 type DecodeTypes interface {
-	TickerReq | CreateTokenReq | TokensListRequest | BuySellTokenReq | OrderDataReq
+	TickerReq | CreateTokenReq | TokensListRequest | BuySellTokenReq | OrderDataReq | QuoteReq | BalaceReq | OwnerReq
 }
 
 func decodeTokensListRequest(vars map[string]string) (any, error) {
@@ -106,6 +119,12 @@ func DecodeRequest[T DecodeTypes](ctx context.Context, r *http.Request) (interfa
 
 type TokensListRequest struct {
 	Skip int
+}
+
+func DecodeEmptyreq() httptransport.DecodeRequestFunc {
+	return func(ctx context.Context, r *http.Request) (interface{}, error) {
+		return nil, nil
+	}
 }
 
 func DecodePathParams(validate *validator.Validate, f func(data map[string]string) (any, error)) httptransport.DecodeRequestFunc {

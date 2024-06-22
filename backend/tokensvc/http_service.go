@@ -36,14 +36,14 @@ func NewHTTPServer(srv TokenDataService) http.Handler {
 		serverOptions...,
 	))
 
-	r.Methods("GET").Path("/token/v1/buy").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/token/v1/buy").Handler(httptransport.NewServer(
 		endpoints.buyTokenEndpoint,
 		DecodeRequest[BuySellTokenReq],
 		httptransport.EncodeJSONResponse,
 		serverOptions...,
 	))
 
-	r.Methods("GET").Path("/token/v1/sell").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/token/v1/sell").Handler(httptransport.NewServer(
 		endpoints.sellTokenEndpoint,
 		DecodeRequest[BuySellTokenReq],
 		httptransport.EncodeJSONResponse,
@@ -60,6 +60,34 @@ func NewHTTPServer(srv TokenDataService) http.Handler {
 	r.Methods("GET").Path("/token/v1/fetch/allorders/{skip}").Handler(httptransport.NewServer(
 		endpoints.fetchAllOrdersEndpoint,
 		DecodePathParams(validate, decodeTokensListRequest),
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("GET").Path("/token/v1/tickerdata").Handler(httptransport.NewServer(
+		endpoints.fetchTickerDataEndpoint,
+		DecodeEmptyreq(),
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/quote").Handler(httptransport.NewServer(
+		endpoints.fetchQuoteEndpoint,
+		DecodeRequest[QuoteReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/balance").Handler(httptransport.NewServer(
+		endpoints.fetchBalanceEndpoint,
+		DecodeRequest[BalaceReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/owner").Handler(httptransport.NewServer(
+		endpoints.fetchOwnerEndpoint,
+		DecodeRequest[OwnerReq],
 		httptransport.EncodeJSONResponse,
 		serverOptions...,
 	))

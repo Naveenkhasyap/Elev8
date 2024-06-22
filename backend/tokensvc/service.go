@@ -8,6 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NethermindEth/juno/core/felt"
+	"github.com/NethermindEth/starknet.go/rpc"
+	"github.com/NethermindEth/starknet.go/utils"
 	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
 	"github.com/gofiles/internal/contracts"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -23,6 +26,10 @@ type TokenDataService interface {
 	FetchAllOrders(ctx context.Context, skip int) ([]OrderData, error)
 	FetchOrdersByAddress(ctx context.Context, filter_address string) ([]OrderData, error)
 	FetchOrdersByTicker(ctx context.Context, ticker string) ([]OrderData, error)
+	FetchTickerData(ctx context.Context) ([]DataPoint, error)
+	FetchBalance(ctx context.Context, tokenAddress string) (string, error)
+	FetchOwner(ctx context.Context, tokenAddress string) (string, error)
+	FetchQuote(ctx context.Context, tokenAddress string, amount string) (string, error)
 }
 
 type tokenDatasvc struct {
@@ -220,4 +227,109 @@ func (svc tokenDatasvc) FetchOrdersByTicker(ctx context.Context, ticker string) 
 	}
 
 	return ordersList, nil
+}
+
+func (svc tokenDatasvc) FetchTickerData(ctx context.Context) ([]DataPoint, error) {
+	var count = 100
+	data := make([]DataPoint, count)
+	baseTime := time.Now().AddDate(0, 0, -count).Unix()
+
+	for i := 0; i < count; i++ {
+		open := rand.Float64() * 100
+		close := rand.Float64() * 100
+		high := open + rand.Float64()*10
+		low := open - rand.Float64()*10
+		volume := rand.Float64() * 1000
+
+		data[i] = DataPoint{
+			Time:   baseTime + int64(i*3600),
+			Open:   open,
+			High:   high,
+			Low:    low,
+			Close:  close,
+			Volume: volume,
+		}
+	}
+	return data, nil
+}
+func (svc tokenDatasvc) FetchBalance(ctx context.Context, tokenAddress string) (string, error) {
+	contractAddress, err := utils.HexToFelt(tokenAddress)
+	var contractMethod = "get_balance"
+	if err != nil {
+		panic(err)
+	}
+
+	// Make read contract call
+	tx := rpc.FunctionCall{
+		ContractAddress:    contractAddress,
+		EntryPointSelector: utils.GetSelectorFromNameFelt(contractMethod),
+	}
+
+	fmt.Println("Making Call() request")
+	callResp, err := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "pending"})
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, callResp[0]))
+	return fmt.Sprintf("%v", callResp[0]), nil
+}
+
+func (svc tokenDatasvc) FetchQuote(ctx context.Context, tokenAddress string, amount string) (string, error) {
+	var contractMethod = "quote"
+	contractAddress, err := utils.HexToFelt(tokenAddress)
+	if err != nil {
+		panic(err)
+	}
+	amountf, err := utils.HexToFelt(amount)
+	if err != nil {
+		return "", fmt.Errorf("unable to generate calldata for amount bytearray: %s, err: %v", amount, err)
+	}
+	stylef, err := utils.HexToFelt("1")
+	if err != nil {
+		return "", fmt.Errorf("unable to generate calldata for style bytearray: %s, err: %v", err)
+	}
+
+	sa, err := utils.HexToFelt("0")
+	if err != nil {
+		return "", fmt.Errorf("unable to generate calldata for sa bytearray:, err: %v", err)
+	}
+
+	// Make read contract call
+	tx := rpc.FunctionCall{
+		ContractAddress:    contractAddress,
+		EntryPointSelector: utils.GetSelectorFromNameFelt(contractMethod),
+		Calldata:           []*felt.Felt{amountf, sa, stylef},
+	}
+
+	fmt.Println("Making Call() request")
+	callResp, err := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "latest"})
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, callResp[0]))
+	return fmt.Sprintf("%v", callResp[0]), nil
+}
+func (svc tokenDatasvc) FetchOwner(ctx context.Context, tokenAddress string) (string, error) {
+	contractAddress, err := utils.HexToFelt(tokenAddress)
+	var contractMethod = "owner"
+	if err != nil {
+		panic(err)
+	}
+
+	// Make read contract call
+	tx := rpc.FunctionCall{
+		ContractAddress:    contractAddress,
+		EntryPointSelector: utils.GetSelectorFromNameFelt(contractMethod),
+	}
+
+	fmt.Println("Making Call() request")
+	callResp, err := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "latest"})
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, callResp[0]))
+	return fmt.Sprintf("%v", callResp[0]), nil
 }

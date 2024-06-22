@@ -8,24 +8,32 @@ import (
 )
 
 type Endpoints struct {
-	createTokenEndpoint    endpoint.Endpoint
-	fetchTokenEndpoint     endpoint.Endpoint
-	fetchAllTokenEndpoint  endpoint.Endpoint
-	buyTokenEndpoint       endpoint.Endpoint
-	sellTokenEndpoint      endpoint.Endpoint
-	fetchOrdersEndpoint    endpoint.Endpoint
-	fetchAllOrdersEndpoint endpoint.Endpoint
+	createTokenEndpoint     endpoint.Endpoint
+	fetchTokenEndpoint      endpoint.Endpoint
+	fetchAllTokenEndpoint   endpoint.Endpoint
+	buyTokenEndpoint        endpoint.Endpoint
+	sellTokenEndpoint       endpoint.Endpoint
+	fetchOrdersEndpoint     endpoint.Endpoint
+	fetchAllOrdersEndpoint  endpoint.Endpoint
+	fetchTickerDataEndpoint endpoint.Endpoint
+	fetchQuoteEndpoint      endpoint.Endpoint
+	fetchBalanceEndpoint    endpoint.Endpoint
+	fetchOwnerEndpoint      endpoint.Endpoint
 }
 
 func newEndpoints(s TokenDataService) Endpoints {
 	return Endpoints{
-		createTokenEndpoint:    makecreateTokenEndpoint(s),
-		fetchTokenEndpoint:     makefetchTokenEndpoint(s),
-		fetchAllTokenEndpoint:  makefetchAllTokenEndpoint(s),
-		buyTokenEndpoint:       makebuyTokenEndpoint(s),
-		sellTokenEndpoint:      makesellTokenEndpoint(s),
-		fetchOrdersEndpoint:    makefetchOrdersEndpoint(s),
-		fetchAllOrdersEndpoint: makefetchAllOrdersEndpoint(s),
+		createTokenEndpoint:     makecreateTokenEndpoint(s),
+		fetchTokenEndpoint:      makefetchTokenEndpoint(s),
+		fetchAllTokenEndpoint:   makefetchAllTokenEndpoint(s),
+		buyTokenEndpoint:        makebuyTokenEndpoint(s),
+		sellTokenEndpoint:       makesellTokenEndpoint(s),
+		fetchOrdersEndpoint:     makefetchOrdersEndpoint(s),
+		fetchAllOrdersEndpoint:  makefetchAllOrdersEndpoint(s),
+		fetchTickerDataEndpoint: makefetchTickerDataEndpoint(s),
+		fetchQuoteEndpoint:      makefetchQuoteEndpoint(s),
+		fetchBalanceEndpoint:    makefetchBalanceEndpoint(s),
+		fetchOwnerEndpoint:      makefetchOwnerEndpoint(s),
 	}
 
 }
@@ -149,6 +157,74 @@ func makefetchAllOrdersEndpoint(s TokenDataService) endpoint.Endpoint {
 		return Response{
 			Success: success,
 			Data:    tokenList,
+		}, err
+	}
+}
+
+func makefetchTickerDataEndpoint(s TokenDataService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+
+		dataList, err := s.FetchTickerData(ctx)
+		success := err == nil
+		return Response{
+			Success: success,
+			Data:    dataList,
+		}, err
+	}
+}
+
+func makefetchQuoteEndpoint(s TokenDataService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(QuoteReq)
+		if !ok {
+			return nil, &GenericError{
+				Code:    400,
+				Message: "Bad Request",
+			}
+		}
+
+		dataList, err := s.FetchQuote(ctx, req.TokenAddress, req.Amount)
+		success := err == nil
+		return Response{
+			Success: success,
+			Data:    dataList,
+		}, err
+	}
+}
+
+func makefetchBalanceEndpoint(s TokenDataService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(BalaceReq)
+		if !ok {
+			return nil, &GenericError{
+				Code:    400,
+				Message: "Bad Request",
+			}
+		}
+
+		dataList, err := s.FetchBalance(ctx, req.TokenAddress)
+		success := err == nil
+		return Response{
+			Success: success,
+			Data:    dataList,
+		}, err
+	}
+}
+
+func makefetchOwnerEndpoint(s TokenDataService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(OwnerReq)
+		if !ok {
+			return nil, &GenericError{
+				Code:    400,
+				Message: "Bad Request",
+			}
+		}
+		dataList, err := s.FetchOwner(ctx, req.TokenAddress)
+		success := err == nil
+		return Response{
+			Success: success,
+			Data:    dataList,
 		}, err
 	}
 }
