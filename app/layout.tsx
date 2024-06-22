@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Head from "next/head";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Providers } from "./Provider";
 
 export const metadata: Metadata = {
   title: "Elev8",
   description: "A platform to launch coins on Starknet chain hassle free.",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,7 +21,23 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </Head>
-      <body className={inter.className}>{children}</body>
+      {/* <DynamicContextProvider
+        settings={{
+          environmentId: "2762a57b-faa4-41ce-9f16-abff9300e2c9",
+          recommendedWallets: [
+            { walletKey: "phantomevm", label: "Popular" },
+            { walletKey: "okxwallet" },
+          ],
+        }}
+      >
+        <body className={inter.className}>{children}</body>
+      </DynamicContextProvider>  */}
+
+      <body>
+        {/* <Provider store={store}> */}
+        <Providers>{children}</Providers>
+        {/* </Provider> */}
+      </body>
     </html>
   );
 }
