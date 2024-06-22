@@ -1,6 +1,9 @@
 module github.com/gofiles
 
-go 1.21.7
+go 1.23
+
+
+require go.mongodb.org/mongo-driver v1.15.1
 
 
 require go.mongodb.org/mongo-driver v1.15.1
