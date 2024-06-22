@@ -3,9 +3,7 @@ import Header from "../src/component/header/Header";
 import { useEffect, useRef } from "react";
 import Carts from "@/component/cart/Carts";
 import CryptoTable from "@/component/cryptoTable/CryptoTable";
-import Model from "@/component/model/Model";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsModelOpen } from "../store/slices/exampleSlice";
 
 export default function Home() {
   const bgRef = useRef<HTMLVideoElement>(null);

@@ -17,9 +17,9 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ symbol }) => {
     if (widgetRef.current) {
       const script = document.createElement("script");
       script.src =
-        "../../../charting_library-master/charting_library/charting_library.standalone.js";
-      // script.src =
-      //   "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+        // "../../../charting_library-master/charting_library/charting_library.standalone.js";
+      script.src =
+        "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
       script.async = true;
       script.onload = () => {
         console.log("TradingView script loaded");
