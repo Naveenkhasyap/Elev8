@@ -5,6 +5,9 @@ go 1.23
 
 require go.mongodb.org/mongo-driver v1.15.1
 
+
+require go.mongodb.org/mongo-driver v1.15.1
+
 require (
 	github.com/NethermindEth/juno v0.3.1 // indirect
 	github.com/NethermindEth/starknet.go v0.7.0 // indirect
