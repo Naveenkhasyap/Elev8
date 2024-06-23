@@ -8,6 +8,8 @@ import { elev8 } from "@/utils/Images";
 import { setCryptoCoins } from "../store/slices/walletSlice";
 import { useDispatch } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
+import BuySell from "@/component/buySell/BuySell";
+import { Router } from "next/router";
 export default function Home() {
   const bgRef = useRef<HTMLVideoElement>(null);
   const dispatch = useDispatch();
@@ -28,7 +30,7 @@ export default function Home() {
         return;
       }
     } catch (error) {
-      toast("something went wrong");
+      toast.error("something went wrong");
       console.error("Error fetching tokens:", error);
     }
   };
@@ -39,10 +41,25 @@ export default function Home() {
       bgRef.current.playbackRate = 0.5;
     }
   }, []);
+
+  const BuyHandler = (
+    amount: number,
+    address: string,
+    ticker: string,
+    type: string
+  ) => {
+    if (!address) {
+      toast.error("Please Connect your Wallet");
+
+    }
+
+    console.log(amount, address, ticker, type, "checking values=--->");
+  };
   return (
     <main>
       <Toaster />
       <Header />
+      {/* <BuySell text={"Buy"} clickHandler={BuyHandler} /> */}
       <div className="relative h-[75vh] w-full">
         <video
           ref={bgRef}

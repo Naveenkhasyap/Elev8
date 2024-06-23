@@ -9,7 +9,6 @@ import ChartErrorBoundary from "@/component/ErrorBoundary";
 import Button from "@/component/Button";
 import { Token } from "@/component/cryptoTable/model";
 
-
 Chart.register(...registerables);
 
 const CryptoDetail: React.FC = () => {

@@ -5,7 +5,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    let response = await apiClient.get(`/token/v1/fetch/all/0`);
+    let response = await apiClient.get(`/token/v1/fetch/all`);
     if (response.status === 200) {
       return res.status(200).json({
         ...response.data,

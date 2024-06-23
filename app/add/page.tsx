@@ -90,13 +90,6 @@ function Page() {
               className={inputStyle}
               onChange={handleImageChange}
             />
-
-            {/* <button
-              className="w-full px-4 py-2 mb-4 text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-              onClick={handleTokenCreate}
-            >
-              Submit
-            </button> */}
             <Button
               text="Submit"
               onClick={() => handleTokenCreate()}
