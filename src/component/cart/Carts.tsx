@@ -1,30 +1,14 @@
-import Image from "next/image";
 import React from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { MdArrowDropUp } from "react-icons/md";
+import { Token } from "../cryptoTable/model";
 
 interface CartProp {
   title?: string;
   coins?: Token[];
 }
 
-type Token = {
-  name: string;
-  ticker: string;
-  description: string;
-  image: string;
-  userAccountAddress: string;
-  status: string;
-  txnHash: string;
-  created_at: string;
-  updated_at: string;
-  change24hr: string;
-  change7day: string;
-  price: string;
-  marketCap: string;
-};
 function Carts({ title, coins }: CartProp) {
-  console.log(coins, "coins");
   return (
     <div className=" shadow-xs bg-blue-950/30 shadow-neutral-100    w-1/2 text-white rounded py-4">
       <strong className="flex justify-center text-xl">{title}</strong>

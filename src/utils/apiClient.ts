@@ -1,8 +1,5 @@
 import axios from "axios";
 const baseUrl = process.env.BASE_URL;
-
-console.log(baseUrl, "baseUrl--->");
-
 const apiClient = axios.create({
   baseURL: `${baseUrl}`,
   headers: {

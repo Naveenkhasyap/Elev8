@@ -5,7 +5,7 @@ export interface initialStateI {
 }
 const initialState = {
   modelOpen: true,
-  walletAddress: "",
+  cryptoCoins: [],
 };
 
 export const isMainSlice = createSlice({
@@ -15,10 +15,10 @@ export const isMainSlice = createSlice({
     setIsModelOpen: (state, action) => {
       state.modelOpen = action.payload;
     },
-    setWalletAddress: (state, action) => {
-      state.walletAddress = action.payload;
+    setCryptoCoins: (state, action) => {
+      state.cryptoCoins = action.payload;
     },
   },
 });
-export const { setIsModelOpen } = isMainSlice.actions;
+export const { setIsModelOpen, setCryptoCoins } = isMainSlice.actions;
 export default isMainSlice;

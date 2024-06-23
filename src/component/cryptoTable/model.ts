@@ -145,3 +145,19 @@ export const cryptocurrencies: Cryptocurrency[] = [
     logo: "https://assets.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400",
   },
 ];
+
+export type Token = {
+  name: string;
+  ticker: string;
+  description: string;
+  image: string;
+  userAccountAddress: string;
+  status: string;
+  txnHash: string;
+  created_at: string;
+  updated_at: string;
+  change24hr: string;
+  change7day: string;
+  price: string;
+  marketCap: string;
+};

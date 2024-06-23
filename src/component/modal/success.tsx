@@ -1,17 +1,25 @@
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
-
-function Success({ dispatch, onClose }: any) {
+function Success({ onClose, router }: any) {
   const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      handleClose();
+    }, 3000);
+  });
+
   const handleClose = () => {
     setIsClosing(true);
     setTimeout(() => {
-      dispatch(onClose(false));
+      onClose(true);
+      router.push("/");
     }, 500);
   };
   return (
     <div
-      className={`fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-30  ${
+      className={`fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50  ${
         isClosing
           ? "motion-safe:animate-fade-out"
           : "motion-safe:animate-fade-in"

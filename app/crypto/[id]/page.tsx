@@ -1,18 +1,20 @@
 "use client";
 import { useParams } from "next/navigation";
-import { cryptocurrencies } from "../../../src/component/cryptoTable/model";
 import Header from "@/component/header/Header";
 import TradingViewWidget from "@/component/cryptoDetail/TradingViewWidget";
+import { useSelector } from "react-redux";
 
 const CryptoDetail = () => {
   const params = useParams<{ id: string }>();
+  const { cryptoCoins } = useSelector((state: any) => state.MainSlice);
   if (!params || !params.id) {
     return <div>No ID available</div>;
   }
 
   const { id } = params;
 
-  const crypto = cryptocurrencies.find((c) => c.id.toString() === id);
+  const crypto = cryptoCoins.find((c: any) => c.id.toString() === id);
+  console.log(crypto, "crypto-->");
 
   if (!crypto) {
     return <div>Cryptocurrency not found</div>;

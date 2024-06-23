@@ -2,11 +2,12 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Token } from "./model";
 
 const CryptoTable = ({ tokens }: any) => {
   const router = useRouter();
 
-  const handleRowClick = (id: number) => {
+  const handleRowClick = (id: string) => {
     router.push(`/crypto/${id}`);
   };
 
@@ -23,13 +24,13 @@ const CryptoTable = ({ tokens }: any) => {
           </tr>
         </thead>
         <tbody>
-          {tokens.map((crypto: any, index: number) => {
+          {tokens.map((crypto: Token, index: number) => {
             let imageUrl = `data:image/png;base64,${crypto.image}`;
             return (
               <tr
                 key={crypto.description}
                 className="border-t-[0.4px] border-t-blue-950 cursor-pointer"
-                onClick={() => handleRowClick(crypto.id)}
+                onClick={() => handleRowClick(crypto.name)}
               >
                 <td className="py-2 px-3">{index + 1}</td>
                 <td className="py-2 px-3 flex items-center">
@@ -39,9 +40,9 @@ const CryptoTable = ({ tokens }: any) => {
                     className="w-6 h-6 mr-2 rounded-full"
                   />
                   {crypto.name}
-                  <span className="ml-1 text-gray-200 text-sm">
-                    {crypto.symbol}
-                  </span>
+                  {/* <span className="ml-1 text-gray-200 text-sm">
+                    {crypto.name}
+                  </span> */}
                 </td>
                 <td className="py-2 px-3">{crypto.price}</td>
                 <td className="py-2 px-3">{crypto.marketCap}</td>

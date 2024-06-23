@@ -5,9 +5,12 @@ import Carts from "@/component/cart/Carts";
 import CryptoTable from "@/component/cryptoTable/CryptoTable";
 import { fetchTokens } from "@/utils/apis";
 import { elev8 } from "@/utils/Images";
+import { setCryptoCoins } from "../store/slices/walletSlice";
+import { useDispatch } from "react-redux";
 
 export default function Home() {
   const bgRef = useRef<HTMLVideoElement>(null);
+  const dispatch = useDispatch();
   const [tokens, setTokens] = useState([]);
   const [largestGainer, setLargestGainer] = useState([]);
   const [treadingCoins, setTreadingCoins] = useState([]);
@@ -17,6 +20,7 @@ export default function Home() {
       const response = await fetchTokens();
       if (response && response.data !== undefined) {
         setTokens(response.data.data);
+        dispatch(setCryptoCoins(response.data.data));
         setLargestGainer(response.data.data.slice(0, 3));
         setTreadingCoins(response.data.data.slice(3, 6));
       }

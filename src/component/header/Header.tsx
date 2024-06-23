@@ -5,17 +5,12 @@ import {
 } from "@dynamic-labs/sdk-react-core";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, {useState } from "react";
-import Modal from "../model/Modal";
-import Success from "../model/success";
+import React from "react";
 
 function Header() {
-  const [success, setSuccess] = useState(false);
-  const [coinModel, setCoinModel] = useState(false);
   const router = useRouter();
   const { primaryWallet } = useDynamicContext();
   const { handleLogOut } = useDynamicContext();
-
 
   return (
     <main className="flex  justify-between bg-black px-5  w-full sticky top-0 py-2 shadow-md z-40 border-b-[0.01px] border-tc">
@@ -35,7 +30,7 @@ function Header() {
         <button
           className="bg-white text-black rounded-full px-4 font-oswald py-2"
           onClick={() => {
-            setCoinModel(true);
+            router.push("/add");
           }}
         >
           Launch Token
@@ -60,9 +55,6 @@ function Header() {
             </button>
           </div>
         )}
-
-        {success && <Success onClose={setSuccess} />}
-        {coinModel && <Modal onClose={setCoinModel} setSuccess={setSuccess} />}
       </section>
     </main>
   );
