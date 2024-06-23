@@ -2,7 +2,9 @@ package contracts
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"github.com/NethermindEth/juno/core/felt"
 	"github.com/NethermindEth/starknet.go/rpc"
@@ -74,6 +76,9 @@ func (d *deployer) Launch(ctx context.Context, req DeployerReq) (*felt.Felt, err
 		return nil, fmt.Errorf("gas estimate sign, error: %v", err)
 	}
 
+	b, _ := json.Marshal(txn)
+	slog.Info("txn objext for gas fee", "txn", string(b))
+
 	ge, esterr := gas.EstimateGas(ctx, d.client, &txn)
 	if esterr != nil {
 		return nil, esterr
@@ -86,6 +91,8 @@ func (d *deployer) Launch(ctx context.Context, req DeployerReq) (*felt.Felt, err
 		return nil, err
 	}
 
+	c, _ := json.Marshal(txn1)
+	slog.Info("txn for deploying smart contract", "txn", string(c))
 	res, err := d.localAccount.SignAndInvokeV1Txn(ctx, txn1)
 	if err != nil {
 		return nil, err
