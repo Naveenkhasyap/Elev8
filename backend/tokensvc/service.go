@@ -12,9 +12,10 @@ import (
 	"github.com/NethermindEth/starknet.go/rpc"
 	"github.com/NethermindEth/starknet.go/utils"
 	"github.com/avast/retry-go"
+	"github.com/gofiles/internal/accounts"
 	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
 	"github.com/gofiles/internal/contracts"
-	"github.com/gofiles/internal/helpers"
+	"github.com/holiman/uint256"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -31,7 +32,7 @@ type TokenDataService interface {
 	FetchTickerData(ctx context.Context) ([]DataPoint, error)
 	FetchBalance(ctx context.Context, tokenAddress string) (string, error)
 	FetchOwner(ctx context.Context, tokenAddress string) (string, error)
-	FetchQuote(ctx context.Context, tokenAddress string, amount string) (string, error)
+	FetchQuote(ctx context.Context, tokenAddress string, amount string, side uint8) (string, error)
 	FetchRecipt(ctx context.Context, txnHash string) (ReceiptResp, error)
 }
 
@@ -39,13 +40,15 @@ type tokenDatasvc struct {
 	tokenRepo TokenDatarepo
 	deployer  contracts.Deployer
 	client    *starkrpc.Provider
+	la        accounts.IAccount
 }
 
-func NewTokenDataService(repo TokenDatarepo, deployer contracts.Deployer, client *starkrpc.Provider) TokenDataService {
+func NewTokenDataService(repo TokenDatarepo, deployer contracts.Deployer, account accounts.IAccount, client *starkrpc.Provider) TokenDataService {
 	return &tokenDatasvc{
 		tokenRepo: repo,
 		deployer:  deployer,
 		client:    client,
+		la:        account,
 	}
 }
 
@@ -292,39 +295,12 @@ func (svc tokenDatasvc) FetchBalance(ctx context.Context, tokenAddress string) (
 	return resp.String(), nil
 }
 
-func (svc tokenDatasvc) FetchQuote(ctx context.Context, tokenAddress string, amount string) (string, error) {
-	var contractMethod = "quote"
-	contractAddress, err := utils.HexToFelt(tokenAddress)
+func (svc tokenDatasvc) FetchQuote(ctx context.Context, tokenAddress string, amount string, side uint8) (string, error) {
+	pool, err := contracts.NewPool(tokenAddress, svc.client, svc.la)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	amountf, err := utils.HexToFelt(amount)
-	if err != nil {
-		return "", fmt.Errorf("unable to generate calldata for amount bytearray: %s, err: %v", amount, err)
-	}
-	stylef, err := utils.HexToFelt("1")
-	if err != nil {
-		return "", fmt.Errorf("unable to generate calldata for style bytearray: %s, err: %v", err)
-	}
-
-	sa, err := utils.HexToFelt("0")
-	if err != nil {
-		return "", fmt.Errorf("unable to generate calldata for sa bytearray:, err: %v", err)
-	}
-
-	// Make read contract call
-	tx := rpc.FunctionCall{
-		ContractAddress:    contractAddress,
-		EntryPointSelector: utils.GetSelectorFromNameFelt(contractMethod),
-		Calldata:           []*felt.Felt{amountf, sa, stylef},
-	}
-
-	fmt.Println("Making Call() request")
-	callResp, _ := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "latest"})
-	resp := utils.FeltToBigInt(callResp[0])
-
-	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, resp.String()))
-	return resp.String(), nil
+	return pool.Quote(ctx, uint256.NewInt(121), 0)
 }
 
 func (svc tokenDatasvc) FetchOwner(ctx context.Context, tokenAddress string) (string, error) {
@@ -361,7 +337,6 @@ func (svc tokenDatasvc) getTransactionStatusRetry(ctx context.Context, txnHash *
 }
 
 func (svc tokenDatasvc) FetchRecipt(ctx context.Context, txnHash string) (ReceiptResp, error) {
-	var receiptResp = ReceiptResp{}
 	hash, err := utils.HexToFelt(txnHash)
 	if err != nil {
 		panic(err)
@@ -371,14 +346,51 @@ func (svc tokenDatasvc) FetchRecipt(ctx context.Context, txnHash string) (Receip
 		return ReceiptResp{}, err
 	}
 
+	token := ""
+	pool := ""
+	isTPFound := false
+
 	for _, val := range resp.Result.Events {
-		if len(val.Keys) == 2 && len(val.Data) == 1 {
-			receiptResp.TokenAddress = fmt.Sprintf("%s", val.Data[0])
+		isFound := false
+		for _, d := range val.Keys {
+			if d == "0x27afd33af1e49f0b7aae60f6fb9af7cbe2138a223a293d97c23feee2aeac622" {
+				isFound = true
+				break
+			}
 		}
-		if len(val.Data) == 16 {
-			receiptResp.Ticker = helpers.HexToString(fmt.Sprintf("%s", val.Data[6]))
+
+		if isFound {
+			isTPFound = true
+			token = val.Data[0].(string)
+			pool = val.Data[1].(string)
 		}
 	}
 
-	return receiptResp, nil
+	if !isTPFound {
+		return ReceiptResp{}, fmt.Errorf("invalid data from receipt, txn: %s", txnHash)
+	}
+
+	tokenData, err := svc.tokenRepo.FetchByTxnHash(ctx, txnHash)
+	if err != nil {
+		return ReceiptResp{}, &GenericError{
+			Code:    500,
+			Message: "unable to token by txn hash",
+		}
+	}
+
+	err = svc.tokenRepo.UpdateToken(ctx, tokenData.Ticker, map[string]string{
+		"tokenAddress": token,
+		"poolAddress":  pool,
+	})
+
+	if err != nil {
+		return ReceiptResp{}, &GenericError{
+			Code:    500,
+			Message: "unable to store token address and pool address",
+		}
+	}
+
+	return ReceiptResp{
+		TokenAddress: token,
+	}, nil
 }

@@ -22,6 +22,8 @@ type TokenData struct {
 	Change7day         string    `json:"change7day" bson:"change7day"`
 	Price              string    `json:"price" bson:"price"`
 	MarketCap          string    `json:"marketCap" bson:"marketcap"`
+	TokenAddress       string    `json:"tokenAddress" bson:"tokenAddress"`
+	PoolAddress        string    `json:"poolAddress" bson:"poolAddress"`
 }
 
 type OrderData struct {

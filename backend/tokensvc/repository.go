@@ -13,6 +13,7 @@ import (
 type TokenDatarepo interface {
 	Store(ctx context.Context, tokenData TokenData) error
 	Fetch(ctx context.Context, ticker string) (TokenData, error)
+	FetchByTxnHash(ctx context.Context, txnHash string) (TokenData, error)
 	Update(ctx context.Context, ticker string, tokenData TokenData) error
 	UpdateToken(ctx context.Context, ticker string, body map[string]string) error
 	FetchAll(ctx context.Context, skip int) ([]TokenData, error)
@@ -192,5 +193,15 @@ func (r *repo) FetchAllValid(ctx context.Context) ([]TokenData, error) {
 	}
 
 	err = cursor.All(ctx, &tokenData)
+	return tokenData, err
+}
+
+func (r *repo) FetchByTxnHash(ctx context.Context, txnHash string) (TokenData, error) {
+	collection := r.dbClient.Database("Assets").Collection("tokens")
+	var tokenData TokenData
+	err := collection.FindOne(ctx, bson.M{"txnHash": txnHash}).Decode(&tokenData)
+	if err != nil {
+		return TokenData{}, err
+	}
 	return tokenData, err
 }

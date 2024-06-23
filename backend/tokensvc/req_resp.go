@@ -76,6 +76,7 @@ type BuyTokenRes struct {
 type QuoteReq struct {
 	TokenAddress string `json:"tokenAddress" bson:"tokenAddress"`
 	Amount       string `json:"amount" bson:"amount"`
+	Side         uint8  `json:"side"`
 }
 
 type OwnerReq struct {

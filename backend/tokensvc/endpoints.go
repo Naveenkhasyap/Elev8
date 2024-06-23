@@ -179,7 +179,7 @@ func makefetchQuoteEndpoint(s TokenDataService) endpoint.Endpoint {
 			}
 		}
 
-		dataList, err := s.FetchQuote(ctx, req.TokenAddress, req.Amount)
+		dataList, err := s.FetchQuote(ctx, req.TokenAddress, req.Amount, req.Side)
 		success := err == nil
 		return Response{
 			Success: success,
