@@ -79,7 +79,7 @@ func (r *repo) FetchAll(ctx context.Context, skip int) ([]TokenData, error) {
 		return []TokenData{}, err
 	}
 
-	err = cursor.All(ctx, tokenList)
+	err = cursor.All(ctx, &tokenList)
 	return tokenList, err
 }
 
@@ -171,7 +171,7 @@ func (r *repo) FetchAllOrders(ctx context.Context, skip int) ([]OrderData, error
 		return []OrderData{}, err
 	}
 
-	err = cursor.All(ctx, orderList)
+	err = cursor.All(ctx, &orderList)
 	return orderList, err
 }
 
@@ -189,6 +189,6 @@ func (r *repo) FetchAllValid(ctx context.Context) ([]TokenData, error) {
 		return []TokenData{}, err
 	}
 
-	err = cursor.All(ctx, tokenData)
+	err = cursor.All(ctx, &tokenData)
 	return tokenData, err
 }
