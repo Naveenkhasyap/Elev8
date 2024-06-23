@@ -132,13 +132,13 @@ func DecodePathParams(validate *validator.Validate, f func(data map[string]strin
 		vars := mux.Vars(r)
 		request, err := f(vars)
 		if err != nil {
-			slog.Error("err", err, "msg", "error in processing path params")
+			slog.Error("error in processing path params", "err", err)
 			return nil, BadRequest
 		}
 		err = validate.Struct(request)
 		if err != nil {
 			if _, ok := err.(*validator.InvalidValidationError); ok {
-				slog.Error("err", err, "msg", "invalid validation error")
+				slog.Error("invalid validation error", "err", err)
 			}
 
 			return nil, BadRequest

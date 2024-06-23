@@ -27,33 +27,33 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		slog.Error("error loading env")
+		slog.Error("error loading env", "err", err)
 		os.Exit(-1)
 	}
 
 	rpcx, rpcerr := rpc.NewProvider(os.Getenv("RPC_URL"))
 	if rpcerr != nil {
-		slog.Error("error rpc init")
+		slog.Error("error rpc init", "err", err)
 		os.Exit(-1)
 	}
 
 	rpcClient := initStarkRPC(os.Getenv("RPC_URL"), rpcx)
 	client, err := initMongoConnections(context.TODO())
 	if err != nil {
-		slog.Error("error mongo init", err)
+		slog.Error("error mongo init", "err", err)
 		os.Exit(-1)
 	}
 	fmt.Println("mongo connection successful")
 
 	account, err := initAccount(rpcClient)
 	if err != nil {
-		slog.Error("error account init")
+		slog.Error("error account init", "err", err)
 		os.Exit(-1)
 	}
 
 	deployer, err := initDeployer(rpcClient, account)
 	if err != nil {
-		slog.Error("error deployer init")
+		slog.Error("error deployer init", "err", err)
 		os.Exit(-1)
 	}
 
@@ -92,25 +92,25 @@ func main() {
 
 	err, ok := <-errs
 	if ok {
-		slog.Error("error from Server", err)
+		slog.Error("error from Server", "err", err)
 		os.Exit(-1)
 	} else {
-		slog.Error("exit channel empty", err)
+		slog.Error("exit channel empty", "err", err)
 	}
 
 }
 
 func pollOrderforStatus(ctx context.Context, client *mongo.Client, rpcClient *starkrpc.Provider) {
-	slog.Info("msg", "polling orders")
+	slog.Info("msg", "info", "polling orders")
 	tokenCollection := client.Database("Assets").Collection("tokens")
 	cursor, err := tokenCollection.Find(ctx, bson.M{"status": bson.M{"$eq": ""}})
 	if err != nil {
-		slog.Error("err in finding poll data", err)
+		slog.Error("err in finding poll data", "err", err)
 	}
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		slog.Info("msg", "looping now")
+		slog.Info("msg", "info", "looping now")
 		var mode tokensvc.TokenData
 		err1 := cursor.Decode(&mode)
 		if err1 != nil {
@@ -119,10 +119,10 @@ func pollOrderforStatus(ctx context.Context, client *mongo.Client, rpcClient *st
 		if mode.TransactionHash != "" {
 			hash, err := new(felt.Felt).SetString(mode.TransactionHash)
 			if err != nil {
-				slog.Error("error converting hash to felt", err)
+				slog.Error("error converting hash to felt", "err", err)
 			}
 			resp, _ := rpcClient.GetTransactionStatus(ctx, hash)
-			slog.Info("Transaction status", resp)
+			slog.Info("Transaction status", "resp", resp)
 			if resp == nil {
 				continue
 			}
@@ -132,7 +132,7 @@ func pollOrderforStatus(ctx context.Context, client *mongo.Client, rpcClient *st
 						"status": string(resp.FinalityStatus),
 					}})
 				if err != nil {
-					slog.Error("error updating status in go routine", err)
+					slog.Error("error updating status in go routine", "err", err)
 				}
 			}
 		}

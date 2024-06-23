@@ -74,7 +74,7 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 	}
 	err := svc.tokenRepo.Store(ctx, dbData)
 	if err != nil {
-		slog.Error("error while storing token ", tokenData.Ticker, "error:", err)
+		slog.Error("error while storing token ", "tokenData.Ticker,", tokenData.Ticker, "error:", err)
 		return CreateTokenRes{}, err
 	}
 
@@ -85,26 +85,26 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 	})
 
 	if err != nil {
-		slog.Error("unable to deploy contract, err: ", err)
+		slog.Error("unable to deploy contract,", " err: ", err)
 		return CreateTokenRes{}, DeployError
 	}
 
 	txnStatusResp, statuserr := svc.client.GetTransactionStatus(ctx, res)
 	if statuserr != nil {
-		slog.Error("unable to get transaction status, err: ", statuserr)
+		slog.Error("unable to get transaction status,", " err: ", statuserr)
 		return CreateTokenRes{}, FetchTxnStatusError
 	}
-	slog.Info("FinalityStatus", txnStatusResp.FinalityStatus, "ExecutionStatus:", txnStatusResp.ExecutionStatus, "txn receipt", res)
+	slog.Info("Txn status", "FinalityStatus", txnStatusResp.FinalityStatus, "ExecutionStatus:", txnStatusResp.ExecutionStatus, "txn receipt", res)
 
 	//updating status
 	errUpdate := svc.tokenRepo.UpdateStatus(ctx, tokenData.Ticker, string(txnStatusResp.FinalityStatus))
 	if errUpdate != nil {
-		slog.Error("error in updating status", errUpdate)
+		slog.Error("error in updating status", "errUpdate", errUpdate)
 	}
 	//updating hash
 	errtxn := svc.tokenRepo.UpdateTxnHash(ctx, tokenData.Ticker, fmt.Sprintf("%v", res))
 	if errtxn != nil {
-		slog.Error("error in updating status", errUpdate)
+		slog.Error("error in updating status", "errUpdate", errUpdate)
 	}
 
 	return CreateTokenRes{
@@ -115,7 +115,7 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 func (svc tokenDatasvc) FetchToken(ctx context.Context, ticker string) (TokenData, error) {
 	res, err := svc.tokenRepo.Fetch(ctx, ticker)
 	if err != nil && err == mongo.ErrNoDocuments {
-		slog.Error("error fetching token with ticker", ticker, "error:", err)
+		slog.Error("error fetching token with", " ticker", ticker, "error:", err)
 		return TokenData{}, TokenNotFound
 	} else if err != nil {
 		return TokenData{}, err
@@ -127,7 +127,7 @@ func (svc tokenDatasvc) FetchAllToken(ctx context.Context, skip int) ([]TokenDat
 	//Todo
 	res, err := svc.tokenRepo.FetchAll(ctx, skip)
 	if err != nil {
-		slog.Error("error fetching all token ", err)
+		slog.Error("error fetching all token ", "err", err)
 		return []TokenData{}, err
 	}
 	return res, nil
@@ -136,7 +136,7 @@ func (svc tokenDatasvc) UpdateToken(ctx context.Context, tokenData TokenData) er
 	//Todo
 	err := svc.tokenRepo.Update(ctx, tokenData.Ticker, tokenData)
 	if err != nil {
-		slog.Error("error updating token for ticker ", tokenData.Ticker, "error:", err)
+		slog.Error("error updating token for ticker ", " tokenData.Ticker", tokenData.Ticker, "error:", err)
 		return err
 	}
 	return nil
@@ -157,7 +157,7 @@ func (svc tokenDatasvc) BuyToken(ctx context.Context, ticker string, buyDataReq 
 
 	tokenOwner, err := svc.tokenRepo.FetchOwnerofTicker(ctx, buyDataReq.Ticker)
 	if err != nil {
-		slog.Error("error in fetching token owner", err)
+		slog.Error("error in fetching token owner", "err", err)
 	}
 	if strings.EqualFold(tokenOwner, buyDataReq.UserAccountAddress) {
 		buyOrder.IsOwner = true
@@ -165,7 +165,7 @@ func (svc tokenDatasvc) BuyToken(ctx context.Context, ticker string, buyDataReq 
 
 	errbuy := svc.tokenRepo.Buy(ctx, buyOrder)
 	if errbuy != nil {
-		slog.Error("error updating token for ticker ", buyDataReq.Ticker, "error:", err)
+		slog.Error("error updating token for ", "ticker ", buyDataReq.Ticker, "error:", err)
 		return err
 	}
 	return nil
@@ -186,7 +186,7 @@ func (svc tokenDatasvc) SellToken(ctx context.Context, ticker string, sellDataRe
 
 	tokenOwner, err := svc.tokenRepo.FetchOwnerofTicker(ctx, sellDataReq.Ticker)
 	if err != nil {
-		slog.Error("error in fetching token owner", err)
+		slog.Error("error in fetching token owner", "err", err)
 	}
 	if strings.EqualFold(tokenOwner, sellDataReq.UserAccountAddress) {
 		sellOrder.IsOwner = true
@@ -194,7 +194,7 @@ func (svc tokenDatasvc) SellToken(ctx context.Context, ticker string, sellDataRe
 
 	errsell := svc.tokenRepo.Sell(ctx, sellOrder)
 	if errsell != nil {
-		slog.Error("error updating token for ticker ", sellDataReq.Ticker, "error:", err)
+		slog.Error("error updating token for", " ticker ", sellDataReq.Ticker, "error:", err)
 		return err
 	}
 	return nil
@@ -202,7 +202,7 @@ func (svc tokenDatasvc) SellToken(ctx context.Context, ticker string, sellDataRe
 func (svc tokenDatasvc) FetchAllOrders(ctx context.Context, skip int) ([]OrderData, error) {
 	orderList, err := svc.tokenRepo.FetchAllOrders(ctx, skip)
 	if err != nil {
-		slog.Error("error fetchin all orders ", err)
+		slog.Error("error fetchin all orders ", "err", err)
 		return []OrderData{}, err
 	}
 
@@ -212,7 +212,7 @@ func (svc tokenDatasvc) FetchAllOrders(ctx context.Context, skip int) ([]OrderDa
 func (svc tokenDatasvc) FetchOrdersByAddress(ctx context.Context, filter_address string) ([]OrderData, error) {
 	ordersList, err := svc.tokenRepo.FetchOrderByAddress(ctx, filter_address)
 	if err != nil {
-		slog.Error("error fetching orders by address ", filter_address, "error:", err)
+		slog.Error("error fetching orders by address ", "filter_address", filter_address, "error:", err)
 		return []OrderData{}, err
 	}
 
@@ -222,7 +222,7 @@ func (svc tokenDatasvc) FetchOrdersByAddress(ctx context.Context, filter_address
 func (svc tokenDatasvc) FetchOrdersByTicker(ctx context.Context, ticker string) ([]OrderData, error) {
 	ordersList, err := svc.tokenRepo.FetchOrderByAddress(ctx, ticker)
 	if err != nil {
-		slog.Error("error fetching orders for ticker ", ticker, "error:", err)
+		slog.Error("error fetching orders for ", "ticker ", ticker, "error:", err)
 		return []OrderData{}, err
 	}
 
@@ -266,13 +266,11 @@ func (svc tokenDatasvc) FetchBalance(ctx context.Context, tokenAddress string) (
 	}
 
 	fmt.Println("Making Call() request")
-	callResp, err := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "pending"})
-	if err != nil {
-		return "", err
-	}
+	callResp, _ := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "latest"})
+	resp := utils.FeltToBigInt(callResp[0])
 
-	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, callResp[0]))
-	return fmt.Sprintf("%v", callResp[0]), nil
+	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, resp.String()))
+	return resp.String(), nil
 }
 
 func (svc tokenDatasvc) FetchQuote(ctx context.Context, tokenAddress string, amount string) (string, error) {
@@ -303,13 +301,11 @@ func (svc tokenDatasvc) FetchQuote(ctx context.Context, tokenAddress string, amo
 	}
 
 	fmt.Println("Making Call() request")
-	callResp, err := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "latest"})
-	if err != nil {
-		return "", err
-	}
+	callResp, _ := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "latest"})
+	resp := utils.FeltToBigInt(callResp[0])
 
-	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, callResp[0]))
-	return fmt.Sprintf("%v", callResp[0]), nil
+	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, resp.String()))
+	return resp.String(), nil
 }
 func (svc tokenDatasvc) FetchOwner(ctx context.Context, tokenAddress string) (string, error) {
 	contractAddress, err := utils.HexToFelt(tokenAddress)
@@ -325,11 +321,8 @@ func (svc tokenDatasvc) FetchOwner(ctx context.Context, tokenAddress string) (st
 	}
 
 	fmt.Println("Making Call() request")
-	callResp, err := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "latest"})
-	if err != nil {
-		return "", err
-	}
+	callResp, _ := svc.client.Call(context.Background(), tx, rpc.BlockID{Tag: "latest"})
 
 	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, callResp[0]))
-	return fmt.Sprintf("%v", callResp[0]), nil
+	return fmt.Sprintf("%s", callResp[0]), nil
 }
