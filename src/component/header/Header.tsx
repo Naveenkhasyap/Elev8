@@ -19,8 +19,8 @@ function Header() {
           <Image
             src={logo}
             alt="logo"
-            width={30}
-            height={30}
+            width={200}
+            height={200}
             className="cursor-pointer"
             onClick={() => router.push("/")}
           />

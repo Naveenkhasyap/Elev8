@@ -6,7 +6,7 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     let quoteData = req.body;
-    let response = await apiClient.post(`/token/v1/create`, quoteData);
+    let response = await apiClient.post(`/token/v1/sell`, quoteData);
     if (response.status === 200) {
       return res.status(200).json({
         ...response.data,

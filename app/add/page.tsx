@@ -6,6 +6,8 @@ import { createToken } from "@/utils/apis";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 function Page() {
   const router = useRouter();
@@ -20,6 +22,27 @@ function Page() {
 
   const handleTokenCreate = async () => {
     setLoader(true);
+    if (!primaryWallet?.address) {
+      setLoader(false);
+      return toast.error("Please Connect your Wallet");
+    }
+
+    if (!ticker) {
+      setLoader(false);
+      return toast.error("Please Enter Ticker");
+    }
+    if (!description) {
+      setLoader(false);
+      return toast.error("Please Enter Description");
+    }
+    if (!name) {
+      setLoader(false);
+      return toast.error("Please select a Name");
+    }
+    if (!image) {
+      setLoader(false);
+      return toast.error("Please select an Logo");
+    }
     const response = await createToken({
       name,
       ticker,
@@ -54,7 +77,17 @@ function Page() {
           className={` bg-blue-950/30 relative px-2 py-2 rounded mt-4 shadow-lg max-w-[50rem] w-[30rem] mx-auto z-40 flex flex-col `}
           onClick={(e) => e.stopPropagation()}
         >
-          <p className=" text-center font-oswald">Create a new Coin</p>
+          <div className={"flex items-center gap-[30%]"}>
+            <IoMdArrowRoundBack
+              className="text-3xl cursor-pointer"
+              onClick={() => {
+                router.back();
+              }}
+            />
+            <p className=" text-center text-xl font-oswald">
+              Create a new Coin
+            </p>
+          </div>
 
           <main className="py-4 px-3">
             <input

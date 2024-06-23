@@ -1,64 +1,35 @@
 "use client";
-import { createToken } from "@/utils/apis";
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 
 type BuySellProps = {
-  onClose?: (value: boolean) => void;
+  onClose: (value: boolean) => void;
   setSuccess?: (value: boolean) => void;
   text: string;
-  clickHandler: (
-    amount: number,
-    address: string,
-    ticker: string,
-    type: string
-  ) => void;
+  style: string;
+  clickHandler: (type: string, amount: number) => void;
 };
 
-const BuySell = ({ onClose, setSuccess, text, clickHandler }: BuySellProps) => {
+const BuySell = ({
+  onClose,
+  setSuccess,
+  text,
+  clickHandler,
+  style,
+}: BuySellProps) => {
   const [isClosing, setIsClosing] = useState(false);
-  const [amount, setAmount] = useState<string>("");
+  const [amount, setAmount] = useState<number>();
 
   const inputStyle = `w-full px-4 py-2 mb-4 text-white bg-blue-800/30 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500`;
 
   const handleClose = () => {
     setIsClosing(true);
     setTimeout(() => {
-      // onClose(false);
+      onClose(false);
     }, 500);
   };
 
-  // const handleTokenCreate = async () => {
-  //   const response = await createToken({
-  //     // amount,
-  // 		// ticker,
-  // 		// "",
-  // 		// "",
 
-  //     // description,
-  //     // image,
-  //     // wallet,
-  //   });
-  //   if (response?.data.success == true) {
-  //     setIsClosing(true);
-  //     setTimeout(() => {
-  //       // onClose(false);
-  //       // setSuccess(true);
-  //     });
-  //   }
-  // };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result?.toString().split(",")[1];
-        // setImage(base64String || ""); // Use empty string as fallback
-      };
-      reader.readAsDataURL(file);
-    }
-  };
   return (
     <div
       className={`fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-30  ${
@@ -93,15 +64,15 @@ const BuySell = ({ onClose, setSuccess, text, clickHandler }: BuySellProps) => {
             placeholder="Amount"
             className={inputStyle}
             value={amount}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setAmount(e.target.value)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setAmount(parseInt(e.target.value));
+            }}
           />
 
           <button
-            className="w-full px-4 py-2 mb-4 text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className={`${style} w-full px-4 py-2 mb-4 text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2`}
             onClick={() => {
-              clickHandler(1, "", "", "");
+              clickHandler(text, amount || 0);
             }}
           >
             {text ? text : "Submit"}

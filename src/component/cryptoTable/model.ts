@@ -161,3 +161,10 @@ export type Token = {
   price: string;
   marketCap: string;
 };
+
+export type buy = {
+  amount: number;
+  address: string;
+  ticker: string;
+  type: string;
+};
