@@ -1,19 +1,40 @@
 "use client";
+import React from "react";
+import { Chart, registerables } from "chart.js";
+import { Line } from "react-chartjs-2";
+import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import Header from "@/component/header/Header";
-import TradingViewWidget from "@/component/cryptoDetail/TradingViewWidget";
-import { useSelector } from "react-redux";
+// import ChartErrorBoundary from "@/component/ErrorBoundary";
 
-const CryptoDetail = () => {
-  const params = useParams<{ id: string }>();
+Chart.register(...registerables);
+interface CryptoCoin {
+  name: string;
+  price: number;
+  change24h: number;
+  change7d: number;
+  marketCap: number;
+  volume: number;
+  chart: string;
+  priceRange: string;
+  fullyDilutedValuation: number;
+  volume24h: number;
+  circulatingSupply: number;
+  totalSupply: number;
+  maxSupply: number;
+  symbol: string;
+}
+
+const CryptoDetail: React.FC = () => {
   const { cryptoCoins } = useSelector((state: any) => state.MainSlice);
+  const params = useParams<{ id: string }>();
+
   if (!params || !params.id) {
     return <div>No ID available</div>;
   }
 
   const { id } = params;
-
-  const crypto = cryptoCoins.find((c: any) => c.id.toString() === id);
+  const crypto = cryptoCoins.find((c: CryptoCoin) => c?.name === id);
 
   if (!crypto) {
     return (
@@ -23,19 +44,46 @@ const CryptoDetail = () => {
     );
   }
 
+  const options = {
+    scales: {
+      y: {
+        beginAtZero: false,
+      },
+    },
+  };
+
+  const data = {
+    labels: [
+      "00:00",
+      "03:00",
+      "06:00",
+      "09:00",
+      "12:00",
+      "15:00",
+      "18:00",
+      "21:00",
+    ],
+    datasets: [
+      {
+        label: "Price",
+        data: [100, 150, 120, 180, 200, 190, 210, 220], // Sample data
+        borderColor: "rgba(75, 192, 192, 1)",
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const chartKey = `${crypto.name}-chart`;
+
   return (
     <>
       <Header />
-      <div className="p-4">
-        <h1 className="text-2xl font-bold">{crypto.name}</h1>
-        <p>Price: {crypto.price}</p>
-        <p>24h Change: {crypto.change24h}</p>
-        <p>7d Change: {crypto.change7d}</p>
-        <p>Market Cap: {crypto.marketCap}</p>
-        <p>Volume: {crypto.volume}</p>
-        <img src={`/charts/${crypto.chart}`} alt={`Chart of ${crypto.name}`} />
-        <TradingViewWidget />
-      </div>
+      <main className="flex justify-between items-center py-4 px-10">
+        {/* <ChartErrorBoundary> */}
+        <section className="w-1/2 flex-1">hi there</section>
+        <Line key={chartKey} data={data} options={options} />
+        {/* </ChartErrorBoundary> */}
+      </main>
     </>
   );
 };
