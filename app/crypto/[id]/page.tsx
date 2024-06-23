@@ -14,10 +14,13 @@ const CryptoDetail = () => {
   const { id } = params;
 
   const crypto = cryptoCoins.find((c: any) => c.id.toString() === id);
-  console.log(crypto, "crypto-->");
 
   if (!crypto) {
-    return <div>Cryptocurrency not found</div>;
+    return (
+      <div className="flex justify-center items-center h-[90vh]">
+        <img src="https://media.tenor.com/hB9OTbewrikAAAAi/work-work-in-progress.gif" />
+      </div>
+    );
   }
 
   return (
