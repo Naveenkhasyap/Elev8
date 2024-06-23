@@ -55,7 +55,6 @@ func NewTokenDataService(repo TokenDatarepo, deployer contracts.Deployer, client
 //     b. Tokens held by the user
 //     b. Tokens purchase and sell history
 func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenReq) (CreateTokenRes, error) {
-
 	dbData := TokenData{
 		Name:               tokenData.Name,
 		Ticker:             tokenData.Ticker,
@@ -72,10 +71,14 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 		Price:              fmt.Sprintf("%f", 1+rand.Float64()*(30-1)),
 		MarketCap:          fmt.Sprintf("%d", 1+rand.Intn(1e9)),
 	}
+
 	err := svc.tokenRepo.Store(ctx, dbData)
 	if err != nil {
-		slog.Error("error while storing token ", tokenData.Ticker, "error:", err)
-		return CreateTokenRes{}, err
+		slog.Error("error storing token", "ticker", tokenData.Ticker, "error", err)
+		return CreateTokenRes{}, &GenericError{
+			Code:    500,
+			Message: fmt.Sprintf("unable to store token in db, err: %v", err),
+		}
 	}
 
 	res, err := svc.deployer.Launch(ctx, contracts.DeployerReq{
@@ -85,30 +88,40 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 	})
 
 	if err != nil {
-		slog.Error("unable to deploy contract, err: ", err)
-		return CreateTokenRes{}, DeployError
+		slog.Error("unable to deploy contract", "err", err)
+		return CreateTokenRes{}, &GenericError{
+			Code:    500,
+			Message: fmt.Sprintf("unable to deploy contract, err: %v", err),
+		}
 	}
 
 	txnStatusResp, statuserr := svc.client.GetTransactionStatus(ctx, res)
 	if statuserr != nil {
-		slog.Error("unable to get transaction status, err: ", statuserr)
-		return CreateTokenRes{}, FetchTxnStatusError
+		slog.Error("unable to get transaction status", "txnHash", res.String(), "err", statuserr)
+		return CreateTokenRes{}, &GenericError{
+			Code:    500,
+			Message: fmt.Sprintf("unable to fetch transaction status, err: %v", statuserr),
+		}
 	}
-	slog.Info("FinalityStatus", txnStatusResp.FinalityStatus, "ExecutionStatus:", txnStatusResp.ExecutionStatus, "txn receipt", res)
 
-	//updating status
-	errUpdate := svc.tokenRepo.UpdateStatus(ctx, tokenData.Ticker, string(txnStatusResp.FinalityStatus))
-	if errUpdate != nil {
-		slog.Error("error in updating status", errUpdate)
-	}
-	//updating hash
-	errtxn := svc.tokenRepo.UpdateTxnHash(ctx, tokenData.Ticker, fmt.Sprintf("%v", res))
-	if errtxn != nil {
-		slog.Error("error in updating status", errUpdate)
+	err = svc.tokenRepo.UpdateToken(ctx, tokenData.Ticker, map[string]string{
+		"status":  string(txnStatusResp.FinalityStatus),
+		"txnHash": res.String(),
+	})
+
+	if err != nil {
+		return CreateTokenRes{}, &GenericError{
+			Code:    500,
+			Message: fmt.Sprintf("unable to update db with staus and txnHash, err: %v", err),
+		}
 	}
 
 	return CreateTokenRes{
-		Name: tokenData.Name,
+		Name:               tokenData.Name,
+		Ticker:             tokenData.Ticker,
+		UserAccountAddress: tokenData.UserAccountAddress,
+		Status:             string(txnStatusResp.FinalityStatus),
+		TxnHash:            res.String(),
 	}, nil
 }
 
