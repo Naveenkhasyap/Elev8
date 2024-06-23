@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/big"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/NethermindEth/starknet.go/curve"
 	"github.com/NethermindEth/starknet.go/rpc"
 	"github.com/NethermindEth/starknet.go/utils"
+	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
 )
 
 type IAccount interface {
@@ -22,12 +24,12 @@ type IAccount interface {
 
 type localAccount struct {
 	accountAddress string
-	client         *rpc.Provider
+	client         *starkrpc.Provider
 	publicKey      *felt.Felt
 	account        *account.Account
 }
 
-func NewAccount(client *rpc.Provider, accountAddress string, privateKey string) (IAccount, error) {
+func NewAccount(client *starkrpc.Provider, accountAddress string, privateKey string) (IAccount, error) {
 	account_addr, err := utils.HexToFelt(accountAddress)
 	if err != nil {
 		return nil, fmt.Errorf("invalid address, err: %v", err)
@@ -71,7 +73,7 @@ func (la *localAccount) Name(ctx context.Context) (*felt.Felt, error) {
 }
 
 func (la *localAccount) Nonce(ctx context.Context) (*felt.Felt, error) {
-	val, err := la.account.Nonce(ctx, rpc.WithBlockTag("latest"), la.account.AccountAddress)
+	val, err := la.account.Nonce(ctx, rpc.WithBlockTag("pending"), la.account.AccountAddress)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch nonce, err: %v", err)
 	}
@@ -91,6 +93,10 @@ func (la *localAccount) SignAndInvokeV1Txn(ctx context.Context, txn rpc.InvokeTx
 	if err != nil {
 		return nil, fmt.Errorf("unable to sign the transaction, err: %v", err)
 	}
+
+	b, _ := json.Marshal(txn)
+	fmt.Println(string(b))
+
 	res, txnErr := la.account.AddInvokeTransaction(ctx, txn)
 	if txnErr != nil {
 		return nil, fmt.Errorf("add invoke txn error, err: %v", err)
