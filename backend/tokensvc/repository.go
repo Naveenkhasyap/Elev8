@@ -3,6 +3,7 @@ package tokensvc
 import (
 	"context"
 
+	"github.com/NethermindEth/starknet.go/rpc"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,6 +16,7 @@ type TokenDatarepo interface {
 	Update(ctx context.Context, ticker string, tokenData TokenData) error
 	UpdateToken(ctx context.Context, ticker string, body map[string]string) error
 	FetchAll(ctx context.Context, skip int) ([]TokenData, error)
+	FetchAllValid(ctx context.Context) ([]TokenData, error)
 	Buy(ctx context.Context, orderData OrderData) error
 	Sell(ctx context.Context, orderData OrderData) error
 	FetchAllOrders(ctx context.Context, skip int) ([]OrderData, error)
@@ -77,7 +79,7 @@ func (r *repo) FetchAll(ctx context.Context, skip int) ([]TokenData, error) {
 		return []TokenData{}, err
 	}
 
-	cursor.All(ctx, tokenList)
+	err = cursor.All(ctx, tokenList)
 	return tokenList, err
 }
 
@@ -169,6 +171,24 @@ func (r *repo) FetchAllOrders(ctx context.Context, skip int) ([]OrderData, error
 		return []OrderData{}, err
 	}
 
-	cursor.All(ctx, orderList)
+	err = cursor.All(ctx, orderList)
 	return orderList, err
+}
+
+func (r *repo) FetchAllValid(ctx context.Context) ([]TokenData, error) {
+	collection := r.dbClient.Database("Assets").Collection("tokens")
+	var tokenData []TokenData
+
+	cursor, err := collection.Find(ctx, bson.M{"$or": bson.A{
+		bson.M{"status": string(rpc.BlockStatus_AcceptedOnL1)},
+		bson.M{"status": string(rpc.BlockStatus_AcceptedOnL2)},
+		bson.M{"status": "RECEIVED"},
+	}})
+
+	if err != nil {
+		return []TokenData{}, err
+	}
+
+	err = cursor.All(ctx, tokenData)
+	return tokenData, err
 }

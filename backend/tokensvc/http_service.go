@@ -15,6 +15,7 @@ func NewHTTPServer(srv TokenDataService) http.Handler {
 	r := mux.NewRouter()
 	serverOptions := []httptransport.ServerOption{httptransport.ServerErrorEncoder(encodeError)}
 	validate := validator.New()
+
 	r.Methods("POST").Path("/token/v1/create").Handler(httptransport.NewServer(
 		endpoints.createTokenEndpoint,
 		DecodeRequest[CreateTokenReq],
@@ -22,16 +23,16 @@ func NewHTTPServer(srv TokenDataService) http.Handler {
 		serverOptions...,
 	))
 
-	r.Methods("POST").Path("/token/v1/fetch").Handler(httptransport.NewServer(
-		endpoints.fetchTokenEndpoint,
-		DecodeRequest[TickerReq],
+	r.Methods("GET").Path("/token/v1/fetch/all").Handler(httptransport.NewServer(
+		endpoints.fetchAllTokenEndpoint,
+		DecodePathParams(validate, decodeTokensListRequest),
 		httptransport.EncodeJSONResponse,
 		serverOptions...,
 	))
 
-	r.Methods("GET").Path("/token/v1/fetch/all/{skip}").Handler(httptransport.NewServer(
-		endpoints.fetchAllTokenEndpoint,
-		DecodePathParams(validate, decodeTokensListRequest),
+	r.Methods("POST").Path("/token/v1/fetch").Handler(httptransport.NewServer(
+		endpoints.fetchTokenEndpoint,
+		DecodeRequest[TickerReq],
 		httptransport.EncodeJSONResponse,
 		serverOptions...,
 	))

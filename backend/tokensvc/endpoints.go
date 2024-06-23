@@ -2,7 +2,6 @@ package tokensvc
 
 import (
 	"context"
-	"errors"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -59,12 +58,7 @@ func makecreateTokenEndpoint(s TokenDataService) endpoint.Endpoint {
 
 func makefetchAllTokenEndpoint(s TokenDataService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req, ok1 := request.(TokensListRequest)
-		if !ok1 {
-			return nil, errors.New("failed to create req fetchCustomerOrdersEndpoint")
-		}
-
-		tokenList, err := s.FetchAllToken(ctx, req.Skip)
+		tokenList, err := s.FetchAllToken(ctx)
 		success := err == nil
 		return Response{
 			Success: success,

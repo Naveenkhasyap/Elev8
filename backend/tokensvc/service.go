@@ -21,7 +21,7 @@ type TokenDataService interface {
 	CreateToken(ctx context.Context, tokenData CreateTokenReq) (CreateTokenRes, error)
 	FetchToken(ctx context.Context, ticker string) (TokenData, error)
 	UpdateToken(ctx context.Context, tokenData TokenData) error
-	FetchAllToken(ctx context.Context, skip int) ([]TokenData, error)
+	FetchAllToken(ctx context.Context) ([]TokenData, error)
 	BuyToken(ctx context.Context, ticker string, buyData BuySellTokenReq) error
 	SellToken(ctx context.Context, ticker string, sellData BuySellTokenReq) error
 	FetchAllOrders(ctx context.Context, skip int) ([]OrderData, error)
@@ -137,12 +137,14 @@ func (svc tokenDatasvc) FetchToken(ctx context.Context, ticker string) (TokenDat
 	return res, nil
 }
 
-func (svc tokenDatasvc) FetchAllToken(ctx context.Context, skip int) ([]TokenData, error) {
-	//Todo
-	res, err := svc.tokenRepo.FetchAll(ctx, skip)
+func (svc tokenDatasvc) FetchAllToken(ctx context.Context) ([]TokenData, error) {
+	res, err := svc.tokenRepo.FetchAllValid(ctx)
 	if err != nil {
 		slog.Error("error fetching all token ", "err", err)
-		return []TokenData{}, err
+		return []TokenData{}, &GenericError{
+			Code:    500,
+			Message: "unable to fetch tokens, please try again",
+		}
 	}
 	return res, nil
 }
