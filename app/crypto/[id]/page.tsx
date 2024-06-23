@@ -5,6 +5,7 @@ import { Line } from "react-chartjs-2";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import Header from "@/component/header/Header";
+import ChartErrorBoundary from "@/component/ErrorBoundary";
 // import ChartErrorBoundary from "@/component/ErrorBoundary";
 
 Chart.register(...registerables);
@@ -36,13 +37,13 @@ const CryptoDetail: React.FC = () => {
   const { id } = params;
   const crypto = cryptoCoins.find((c: CryptoCoin) => c?.name === id);
 
-  if (!crypto) {
-    return (
-      <div className="flex justify-center items-center h-[90vh]">
-        <img src="https://media.tenor.com/hB9OTbewrikAAAAi/work-work-in-progress.gif" />
-      </div>
-    );
-  }
+  // if (!crypto) {
+  //   return (
+  //     <div className="flex justify-center items-center h-[90vh]">
+  //       <img src="https://media.tenor.com/hB9OTbewrikAAAAi/work-work-in-progress.gif" />
+  //     </div>
+  //   );
+  // }
 
   const options = {
     scales: {
@@ -53,36 +54,29 @@ const CryptoDetail: React.FC = () => {
   };
 
   const data = {
-    labels: [
-      "00:00",
-      "03:00",
-      "06:00",
-      "09:00",
-      "12:00",
-      "15:00",
-      "18:00",
-      "21:00",
-    ],
+    labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
     datasets: [
       {
         label: "Price",
-        data: [100, 150, 120, 180, 200, 190, 210, 220], // Sample data
+        data: [100, 150, 120, 180, 200, 190, 210, 220],
         borderColor: "rgba(75, 192, 192, 1)",
         tension: 0.1,
       },
     ],
   };
 
-  const chartKey = `${crypto.name}-chart`;
+  const chartKey = `${crypto?.name}-chart`;
 
   return (
     <>
       <Header />
-      <main className="flex justify-between items-center py-4 px-10">
-        {/* <ChartErrorBoundary> */}
-        <section className="w-1/2 flex-1">hi there</section>
-        <Line key={chartKey} data={data} options={options} />
-        {/* </ChartErrorBoundary> */}
+      <main className="flex justify-between items-center py-10 px-10">
+        <section className="w-1/2 text-blue-600">hi there</section>
+        <ChartErrorBoundary>
+          <div className="w-1/2">
+            <Line key={chartKey} data={data} options={options} />
+          </div>
+        </ChartErrorBoundary>
       </main>
     </>
   );

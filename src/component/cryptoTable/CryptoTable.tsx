@@ -40,9 +40,6 @@ const CryptoTable = ({ tokens }: any) => {
                     className="w-6 h-6 mr-2 rounded-full"
                   />
                   {crypto.name}
-                  {/* <span className="ml-1 text-gray-200 text-sm">
-                    {crypto.name}
-                  </span> */}
                 </td>
                 <td className="py-2 px-3">{crypto.price}</td>
                 <td className="py-2 px-3">{crypto.marketCap}</td>
