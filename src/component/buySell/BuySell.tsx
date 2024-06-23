@@ -29,7 +29,6 @@ const BuySell = ({
     }, 500);
   };
 
-
   return (
     <div
       className={`fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-30  ${

@@ -38,21 +38,20 @@ const CryptoDetail: React.FC = () => {
     }
   };
 
-  if (!params || !params.id) {
-    return <div>No ID available</div>;
-  }
-
-  const { id } = params;
   useEffect(() => {
     fetchData();
   }, []);
 
   useEffect(() => {
+    if (!params || !params.id) {
+      return;
+    }
+    const { id } = params;
     const crypto = cryptoCoin.find((c: Token) => c?.name === id);
     if (crypto) {
       setCurrentToken(crypto);
     }
-  }, [cryptoCoin, id]);
+  }, [cryptoCoin, params]);
 
   const options = {
     scales: {
