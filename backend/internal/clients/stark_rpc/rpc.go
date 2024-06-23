@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -41,9 +42,11 @@ func (i *Provider) WaitForTransaction(ctx context.Context, txnHash *felt.Felt) (
 			return fmt.Errorf("invalid final status empty, txn: %s", txnHash.String())
 		}
 
+		slog.Info("received txnHash status", "txnHash", txnHash, "exeStatus", exeStatus, "finalStatus", finalStatus)
+
 		if finalStatus == rpc.TxnStatus_Rejected {
 			return fmt.Errorf("status rejected, txn: %s", txnHash.String())
-		} else if exeStatus == rpc.TxnExecutionStatusSUCCEEDED || finalStatus == rpc.TxnStatus_Accepted_On_L1 || finalStatus == rpc.TxnStatus_Accepted_On_L2 {
+		} else if exeStatus == rpc.TxnExecutionStatusSUCCEEDED || finalStatus == rpc.TxnStatus_Accepted_On_L1 || finalStatus == rpc.TxnStatus_Accepted_On_L2 || finalStatus == rpc.TxnStatus_Received {
 			rcpt, err := i.waitForReceipt(ctx, txnHash)
 			if err != nil {
 				return fmt.Errorf("unable to get receipt, txn: %s", txnHash.String())
@@ -52,6 +55,10 @@ func (i *Provider) WaitForTransaction(ctx context.Context, txnHash *felt.Felt) (
 		}
 		return nil
 	}, retry.Delay(1*time.Second), retry.Attempts(20))
+
+	if err != nil {
+		slog.Error("error when waiting for transaction", "txnHash", txnHash.String(), "err", err)
+	}
 
 	return receipt, err
 }
@@ -63,9 +70,14 @@ func (i *Provider) waitForReceipt(ctx context.Context, txnHash *felt.Felt) (Tran
 		if err != nil {
 			return fmt.Errorf("unable to get receipt, txn: %s", txnHash.String())
 		}
+		slog.Info("receipt", "txnHash", txnHash.String(), "receipt", rcpt)
 		receipt = rcpt
 		return nil
 	}, retry.Delay(1*time.Second), retry.Attempts(10))
+
+	if err != nil {
+		slog.Error("error when waiting for transaction", "txnHash", txnHash.String(), "err", err)
+	}
 
 	return receipt, err
 }
