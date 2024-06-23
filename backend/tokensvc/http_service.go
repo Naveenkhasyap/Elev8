@@ -25,7 +25,7 @@ func NewHTTPServer(srv TokenDataService) http.Handler {
 
 	r.Methods("GET").Path("/token/v1/fetch/all").Handler(httptransport.NewServer(
 		endpoints.fetchAllTokenEndpoint,
-		DecodePathParams(validate, decodeTokensListRequest),
+		DecodeEmptyreq(),
 		httptransport.EncodeJSONResponse,
 		serverOptions...,
 	))
