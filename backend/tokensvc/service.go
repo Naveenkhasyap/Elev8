@@ -33,7 +33,7 @@ type TokenDataService interface {
 	FetchBalance(ctx context.Context, tokenAddress string) (string, error)
 	FetchOwner(ctx context.Context, tokenAddress string) (string, error)
 	FetchQuote(ctx context.Context, tokenAddress string, amount string, side uint8) (string, error)
-	FetchRecipt(ctx context.Context, txnHash string) (ReceiptResp, error)
+	FetchReceipt(ctx context.Context, txnHash string) (ReceiptResp, error)
 }
 
 type tokenDatasvc struct {
@@ -121,6 +121,10 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 			Message: fmt.Sprintf("unable to update db with staus and txnHash, err: %v", err),
 		}
 	}
+
+	go func(txnHash string) {
+		svc.FetchReceipt(context.Background(), txnHash)
+	}(res.String())
 
 	return CreateTokenRes{
 		Name:               tokenData.Name,
@@ -336,11 +340,16 @@ func (svc tokenDatasvc) getTransactionStatusRetry(ctx context.Context, txnHash *
 	return out, nil
 }
 
-func (svc tokenDatasvc) FetchRecipt(ctx context.Context, txnHash string) (ReceiptResp, error) {
+func (svc tokenDatasvc) FetchReceipt(ctx context.Context, txnHash string) (ReceiptResp, error) {
 	hash, err := utils.HexToFelt(txnHash)
 	if err != nil {
-		panic(err)
+		slog.Error("invalid hash to get receipt", "err", err, "txnHash", txnHash)
+		return ReceiptResp{}, &GenericError{
+			Code:    400,
+			Message: "invalid hash",
+		}
 	}
+
 	resp, err := svc.client.WaitForTransaction(ctx, hash)
 	if err != nil {
 		return ReceiptResp{}, err
@@ -367,7 +376,10 @@ func (svc tokenDatasvc) FetchRecipt(ctx context.Context, txnHash string) (Receip
 	}
 
 	if !isTPFound {
-		return ReceiptResp{}, fmt.Errorf("invalid data from receipt, txn: %s", txnHash)
+		return ReceiptResp{}, &GenericError{
+			Code:    500,
+			Message: fmt.Sprintf("invalid data from receipt, txn: %s", txnHash),
+		}
 	}
 
 	tokenData, err := svc.tokenRepo.FetchByTxnHash(ctx, txnHash)

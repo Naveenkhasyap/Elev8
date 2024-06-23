@@ -234,13 +234,11 @@ func makefetchReceiptEndpoint(s TokenDataService) endpoint.Endpoint {
 				Message: "Bad Request",
 			}
 		}
-		dataList, err := s.FetchRecipt(ctx, req.TxnHash)
+		dataList, err := s.FetchReceipt(ctx, req.TxnHash)
 		success := err == nil
 		return Response{
 			Success: success,
 			Data:    dataList,
 		}, err
-
 	}
-
 }
