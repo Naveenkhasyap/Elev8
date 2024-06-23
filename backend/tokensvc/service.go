@@ -11,6 +11,7 @@ import (
 	"github.com/NethermindEth/juno/core/felt"
 	"github.com/NethermindEth/starknet.go/rpc"
 	"github.com/NethermindEth/starknet.go/utils"
+	"github.com/avast/retry-go"
 	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
 	"github.com/gofiles/internal/contracts"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -95,7 +96,7 @@ func (svc tokenDatasvc) CreateToken(ctx context.Context, tokenData CreateTokenRe
 		}
 	}
 
-	txnStatusResp, statuserr := svc.client.GetTransactionStatus(ctx, res)
+	txnStatusResp, statuserr := svc.getTransactionStatusRetry(ctx, res)
 	if statuserr != nil {
 		slog.Error("unable to get transaction status", "txnHash", res.String(), "err", statuserr)
 		return CreateTokenRes{}, &GenericError{
@@ -145,6 +146,7 @@ func (svc tokenDatasvc) FetchAllToken(ctx context.Context, skip int) ([]TokenDat
 	}
 	return res, nil
 }
+
 func (svc tokenDatasvc) UpdateToken(ctx context.Context, tokenData TokenData) error {
 	//Todo
 	err := svc.tokenRepo.Update(ctx, tokenData.Ticker, tokenData)
@@ -183,6 +185,7 @@ func (svc tokenDatasvc) BuyToken(ctx context.Context, ticker string, buyDataReq 
 	}
 	return nil
 }
+
 func (svc tokenDatasvc) SellToken(ctx context.Context, ticker string, sellDataReq BuySellTokenReq) error {
 	//Todo
 	sellOrder := OrderData{
@@ -212,23 +215,22 @@ func (svc tokenDatasvc) SellToken(ctx context.Context, ticker string, sellDataRe
 	}
 	return nil
 }
+
 func (svc tokenDatasvc) FetchAllOrders(ctx context.Context, skip int) ([]OrderData, error) {
 	orderList, err := svc.tokenRepo.FetchAllOrders(ctx, skip)
 	if err != nil {
 		slog.Error("error fetchin all orders ", "err", err)
 		return []OrderData{}, err
 	}
-
 	return orderList, nil
-
 }
+
 func (svc tokenDatasvc) FetchOrdersByAddress(ctx context.Context, filter_address string) ([]OrderData, error) {
 	ordersList, err := svc.tokenRepo.FetchOrderByAddress(ctx, filter_address)
 	if err != nil {
 		slog.Error("error fetching orders by address ", "filter_address", filter_address, "error:", err)
 		return []OrderData{}, err
 	}
-
 	return ordersList, nil
 }
 
@@ -238,7 +240,6 @@ func (svc tokenDatasvc) FetchOrdersByTicker(ctx context.Context, ticker string) 
 		slog.Error("error fetching orders for ", "ticker ", ticker, "error:", err)
 		return []OrderData{}, err
 	}
-
 	return ordersList, nil
 }
 
@@ -265,6 +266,7 @@ func (svc tokenDatasvc) FetchTickerData(ctx context.Context) ([]DataPoint, error
 	}
 	return data, nil
 }
+
 func (svc tokenDatasvc) FetchBalance(ctx context.Context, tokenAddress string) (string, error) {
 	contractAddress, err := utils.HexToFelt(tokenAddress)
 	var contractMethod = "get_balance"
@@ -320,6 +322,7 @@ func (svc tokenDatasvc) FetchQuote(ctx context.Context, tokenAddress string, amo
 	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, resp.String()))
 	return resp.String(), nil
 }
+
 func (svc tokenDatasvc) FetchOwner(ctx context.Context, tokenAddress string) (string, error) {
 	contractAddress, err := utils.HexToFelt(tokenAddress)
 	var contractMethod = "owner"
@@ -338,4 +341,17 @@ func (svc tokenDatasvc) FetchOwner(ctx context.Context, tokenAddress string) (st
 
 	fmt.Println(fmt.Sprintf("Response to %s():%s ", contractMethod, callResp[0]))
 	return fmt.Sprintf("%s", callResp[0]), nil
+}
+
+func (svc tokenDatasvc) getTransactionStatusRetry(ctx context.Context, txnHash *felt.Felt) (*rpc.TxnStatusResp, error) {
+	var out *rpc.TxnStatusResp
+	retry.Do(func() error {
+		res, err := svc.client.GetTransactionStatus(ctx, txnHash)
+		if err != nil {
+			return err
+		}
+		out = res
+		return nil
+	}, retry.Delay(1*time.Second), retry.Attempts(5))
+	return out, nil
 }

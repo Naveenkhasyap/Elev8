@@ -40,6 +40,7 @@ require (
 )
 
 require (
+	github.com/avast/retry-go v3.0.0+incompatible // indirect
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
