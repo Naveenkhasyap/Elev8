@@ -73,7 +73,7 @@ func (la *localAccount) Name(ctx context.Context) (*felt.Felt, error) {
 }
 
 func (la *localAccount) Nonce(ctx context.Context) (*felt.Felt, error) {
-	val, err := la.account.Nonce(ctx, rpc.WithBlockTag("latest"), la.account.AccountAddress)
+	val, err := la.account.Nonce(ctx, rpc.WithBlockTag("pending"), la.account.AccountAddress)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch nonce, err: %v", err)
 	}

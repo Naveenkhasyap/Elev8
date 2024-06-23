@@ -5,6 +5,7 @@ go 1.21.7
 require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	go.mongodb.org/mongo-driver v1.15.1
+	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )
 
 require (
