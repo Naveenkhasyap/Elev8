@@ -2,15 +2,15 @@ package contracts
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/NethermindEth/juno/core/felt"
 	"github.com/NethermindEth/starknet.go/account"
 	"github.com/NethermindEth/starknet.go/rpc"
 	"github.com/NethermindEth/starknet.go/utils"
-	"github.com/gofiles/accounts"
-	"github.com/gofiles/gas"
+	"github.com/gofiles/internal/accounts"
+	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
+	"github.com/gofiles/internal/gas"
 	"github.com/holiman/uint256"
 )
 
@@ -25,11 +25,11 @@ type IERC20 interface {
 }
 
 type erc20 struct {
-	client       *rpc.Provider
+	client       *starkrpc.Provider
 	tokenAccount *felt.Felt
 }
 
-func NewERC20(client *rpc.Provider, tokenAccount string) (IERC20, error) {
+func NewERC20(client *starkrpc.Provider, tokenAccount string) (IERC20, error) {
 	token, err := utils.HexToFelt(tokenAccount)
 	if err != nil {
 		return &erc20{}, fmt.Errorf("invalid token address, err: %v", err)
@@ -194,9 +194,6 @@ func (e *erc20) gasEstimate(ctx context.Context, la accounts.IAccount, txn rpc.I
 	if err != nil {
 		return nil, fmt.Errorf("gas estimate sign, error: %v", err)
 	}
-
-	b, _ := json.Marshal(txn)
-	fmt.Println(string(b))
 
 	estimate, esterr := gas.EstimateGas(ctx, e.client, &txn)
 	if esterr != nil {

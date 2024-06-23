@@ -1,6 +1,5 @@
 package tokensvc
 
-
 import (
 	"context"
 	"encoding/json"
@@ -16,9 +15,17 @@ func NewHTTPServer(srv TokenDataService) http.Handler {
 	r := mux.NewRouter()
 	serverOptions := []httptransport.ServerOption{httptransport.ServerErrorEncoder(encodeError)}
 	validate := validator.New()
+
 	r.Methods("POST").Path("/token/v1/create").Handler(httptransport.NewServer(
 		endpoints.createTokenEndpoint,
 		DecodeRequest[CreateTokenReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("GET").Path("/token/v1/fetch/all").Handler(httptransport.NewServer(
+		endpoints.fetchAllTokenEndpoint,
+		DecodeEmptyreq(),
 		httptransport.EncodeJSONResponse,
 		serverOptions...,
 	))
@@ -30,9 +37,65 @@ func NewHTTPServer(srv TokenDataService) http.Handler {
 		serverOptions...,
 	))
 
-	r.Methods("GET").Path("/token/v1/fetch/all/{skip}").Handler(httptransport.NewServer(
-		endpoints.fetchAllTokenEndpoint,
+	r.Methods("POST").Path("/token/v1/buy").Handler(httptransport.NewServer(
+		endpoints.buyTokenEndpoint,
+		DecodeRequest[BuySellTokenReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/sell").Handler(httptransport.NewServer(
+		endpoints.sellTokenEndpoint,
+		DecodeRequest[BuySellTokenReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/fetch/order").Handler(httptransport.NewServer(
+		endpoints.fetchOrdersEndpoint,
+		DecodeRequest[OrderDataReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("GET").Path("/token/v1/fetch/allorders/{skip}").Handler(httptransport.NewServer(
+		endpoints.fetchAllOrdersEndpoint,
 		DecodePathParams(validate, decodeTokensListRequest),
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("GET").Path("/token/v1/tickerdata").Handler(httptransport.NewServer(
+		endpoints.fetchTickerDataEndpoint,
+		DecodeEmptyreq(),
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/quote").Handler(httptransport.NewServer(
+		endpoints.fetchQuoteEndpoint,
+		DecodeRequest[QuoteReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/balance").Handler(httptransport.NewServer(
+		endpoints.fetchBalanceEndpoint,
+		DecodeRequest[BalaceReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/owner").Handler(httptransport.NewServer(
+		endpoints.fetchOwnerEndpoint,
+		DecodeRequest[OwnerReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
+
+	r.Methods("POST").Path("/token/v1/poll").Handler(httptransport.NewServer(
+		endpoints.fetchReceiptEndpoint,
+		DecodeRequest[ReceiptReq],
 		httptransport.EncodeJSONResponse,
 		serverOptions...,
 	))
@@ -58,7 +121,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 			Code:    400,
 			Message: InsertError.Error(),
 		}
-	} else if err == BadRequest {
+	} else if err == BadRequest || err == DeployError {
 		w.WriteHeader(http.StatusBadRequest)
 		errInfo = ErrorInfo{
 			Code:    400,
