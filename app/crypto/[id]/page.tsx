@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import BuySell from "@/component/buySell/BuySell";
 import { buyToken, fetchTokens, sellToken } from "@/utils/apis";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import Loading from "@/component/Loading";
 
 Chart.register(...registerables);
 
@@ -23,22 +24,28 @@ const CryptoDetail: React.FC = () => {
   const { primaryWallet } = useDynamicContext();
   const [cryptoCoin, setCryptoCoin] = useState([]);
   const [currentToken, setCurrentToken] = useState<Token | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await fetchTokens();
       if (response && response?.data !== undefined) {
         setCryptoCoin(response?.data?.data);
+        setLoading(false);
       } else {
+        setLoading(false);
         return;
       }
     } catch (error) {
+      setLoading(false);
       toast.error("something went wrong");
       console.error("Error fetching tokens:", error);
     }
   };
 
   useEffect(() => {
+
     fetchData();
   }, []);
 
@@ -61,6 +68,16 @@ const CryptoDetail: React.FC = () => {
     },
   };
 
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="flex justify-center items-center h-[90vh]">
+          <Loading text="Loading...." />
+        </div>
+      </>
+    );
+  }
   if (!currentToken) {
     return (
       <>
