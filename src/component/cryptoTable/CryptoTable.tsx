@@ -24,37 +24,38 @@ const CryptoTable = ({ tokens }: any) => {
           </tr>
         </thead>
         <tbody>
-          {tokens.map((crypto: Token, index: number) => {
-            let imageUrl = `data:image/png;base64,${crypto.image}`;
-            return (
-              <tr
-                key={crypto.description}
-                className="border-t-[0.4px] border-t-blue-950 cursor-pointer"
-                onClick={() => handleRowClick(crypto.name)}
-              >
-                <td className="py-2 px-3">{index + 1}</td>
-                <td className="py-2 px-3 flex items-center">
-                  <img
-                    src={imageUrl}
-                    alt={crypto.name}
-                    className="w-6 h-6 mr-2 rounded-full"
-                  />
-                  {crypto.name}
-                </td>
-                <td className="py-2 px-3">{crypto.price}</td>
-                <td className="py-2 px-3">{crypto.marketCap}</td>
-                <td className="py-2 px-3">
-                  <Image
-                    src={"https://www.coingecko.com/coins/325/sparkline.svg"}
-                    alt={`Chart of ${crypto.name}`}
-                    className="w-16 h-8"
-                    width={100}
-                    height={100}
-                  />
-                </td>
-              </tr>
-            );
-          })}
+          {tokens &&
+            tokens?.map((crypto: Token, index: number) => {
+              let imageUrl = `data:image/png;base64,${crypto.image}`;
+              return (
+                <tr
+                  key={crypto.description}
+                  className="border-t-[0.4px] border-t-blue-950 cursor-pointer"
+                  onClick={() => handleRowClick(crypto.name)}
+                >
+                  <td className="py-2 px-3">{index + 1}</td>
+                  <td className="py-2 px-3 flex items-center">
+                    <img
+                      src={imageUrl}
+                      alt={crypto.name}
+                      className="w-6 h-6 mr-2 rounded-full"
+                    />
+                    {crypto.name}
+                  </td>
+                  <td className="py-2 px-3">{crypto.price}</td>
+                  <td className="py-2 px-3">{crypto.marketCap}</td>
+                  <td className="py-2 px-3">
+                    <Image
+                      src={"https://www.coingecko.com/coins/325/sparkline.svg"}
+                      alt={`Chart of ${crypto.name}`}
+                      className="w-16 h-8"
+                      width={100}
+                      height={100}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       </table>
     </div>

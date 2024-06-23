@@ -7,7 +7,7 @@ import { fetchTokens } from "@/utils/apis";
 import { elev8 } from "@/utils/Images";
 import { setCryptoCoins } from "../store/slices/walletSlice";
 import { useDispatch } from "react-redux";
-
+import toast, { Toaster } from "react-hot-toast";
 export default function Home() {
   const bgRef = useRef<HTMLVideoElement>(null);
   const dispatch = useDispatch();
@@ -16,15 +16,19 @@ export default function Home() {
   const [treadingCoins, setTreadingCoins] = useState([]);
 
   const fetchData = async () => {
+    console.log("reaching here..");
     try {
       const response = await fetchTokens();
-      if (response && response.data !== undefined) {
-        setTokens(response.data.data);
-        dispatch(setCryptoCoins(response.data.data));
+      if (response && response?.data !== undefined) {
+        setTokens(response?.data?.data);
+        dispatch(setCryptoCoins(response?.data?.data));
         setLargestGainer(response.data.data.slice(0, 3));
         setTreadingCoins(response.data.data.slice(3, 6));
+      } else {
+        return;
       }
     } catch (error) {
+      toast("something went wrong");
       console.error("Error fetching tokens:", error);
     }
   };
@@ -37,6 +41,7 @@ export default function Home() {
   }, []);
   return (
     <main>
+      <Toaster />
       <Header />
       <div className="relative h-[75vh] w-full">
         <video

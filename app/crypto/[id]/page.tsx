@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Chart, registerables } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { useSelector } from "react-redux";
@@ -7,43 +7,21 @@ import { useParams } from "next/navigation";
 import Header from "@/component/header/Header";
 import ChartErrorBoundary from "@/component/ErrorBoundary";
 import Button from "@/component/Button";
+import { Token } from "@/component/cryptoTable/model";
+
 
 Chart.register(...registerables);
-interface CryptoCoin {
-  name: string;
-  price: number;
-  change24h: number;
-  change7d: number;
-  marketCap: number;
-  volume: number;
-  chart: string;
-  priceRange: string;
-  fullyDilutedValuation: number;
-  volume24h: number;
-  circulatingSupply: number;
-  totalSupply: number;
-  maxSupply: number;
-  symbol: string;
-}
 
 const CryptoDetail: React.FC = () => {
   const { cryptoCoins } = useSelector((state: any) => state.MainSlice);
   const params = useParams<{ id: string }>();
-
+  const [isBuyLoading, setIsBuyLoading] = useState(false);
   if (!params || !params.id) {
     return <div>No ID available</div>;
   }
 
   const { id } = params;
-  const crypto = cryptoCoins.find((c: CryptoCoin) => c?.name === id);
-
-  if (!crypto) {
-    return (
-      <div className="flex justify-center items-center h-[90vh]">
-        <img src="https://media.tenor.com/hB9OTbewrikAAAAi/work-work-in-progress.gif" />
-      </div>
-    );
-  }
+  const crypto = cryptoCoins.find((c: Token) => c?.name === id);
 
   const options = {
     scales: {
@@ -51,6 +29,24 @@ const CryptoDetail: React.FC = () => {
         beginAtZero: false,
       },
     },
+  };
+
+  if (!crypto) {
+    return (
+      <>
+        <Header />
+        <div className="flex justify-center items-center h-[90vh]">
+          <p>No Crypto Coin found</p>
+        </div>
+      </>
+    );
+  }
+
+  const handleBuyClick = () => {
+    setIsBuyLoading(true);
+    setTimeout(() => {
+      setIsBuyLoading(false);
+    }, 2000);
   };
 
   const data = {
@@ -71,32 +67,32 @@ const CryptoDetail: React.FC = () => {
   return (
     <>
       <Header />
-      <main className="flex justify-between items-center gap-8 py-10 px-10">
-        <section className="w-1/2  flex-col">
+      <main className="flex justify-between items-center gap-4 py-10 px-10">
+        <ChartErrorBoundary>
+          <div className="flex-1 h-full">
+            <Line key={chartKey} data={data} options={options} />
+          </div>
+        </ChartErrorBoundary>
+        <section className="w-1/3  flex-col">
           <div className="flex items-center gap-2">
             <img
               src={imageUrl}
-              width={20}
-              height={20}
+              width={40}
+              height={40}
               alt="coin_logo"
               className="rounded-full"
             />
-            <p className=" text-lg ">
+            <p className=" text-3xl">
               <strong>{crypto?.name}</strong>
               <span className=""> Price #1</span>
             </p>
           </div>
-          <p className="text-xl font-oswald text-green-500">{`$ ${crypto?.price}`}</p>
-          <div className="flex gap-4">
-            <Button text="Buy" styles={"w-10"} />
-            <Button text="Sell" styles={"w-10 bg-tc"} />
+          <p className="text-xl font-oswald text-green-500 mt-2 ml-2 ">{`$ ${crypto?.price}`}</p>
+          <div className="flex gap-4 mt-4">
+            <Button text="Buy" styles={"w-10"} isLoading={isBuyLoading} />
+            <Button text="Sell" styles={"w-10 bg-tc !hover:bg-red-700"} />
           </div>
         </section>
-        <ChartErrorBoundary>
-          <div className="w-1/2 h-full">
-            <Line key={chartKey} data={data} options={options} />
-          </div>
-        </ChartErrorBoundary>
       </main>
       <section className="px-5 flex flex-col gap-6">
         <p className="text-2xl font-oswald px-4">
