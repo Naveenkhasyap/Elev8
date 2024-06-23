@@ -71,7 +71,7 @@ func main() {
 	}()
 
 	go func() {
-		errs <- http.ListenAndServe(":8080", sm)
+		errs <- http.ListenAndServe(":8868", sm)
 	}()
 
 	ticker := time.NewTicker(10 * time.Second)
