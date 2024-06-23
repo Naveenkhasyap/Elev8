@@ -14,6 +14,7 @@ type TokenDatarepo interface {
 	Fetch(ctx context.Context, ticker string) (TokenData, error)
 	Update(ctx context.Context, ticker string, tokenData TokenData) error
 	UpdateStatus(ctx context.Context, ticker string, status string) error
+	UpdateToken(ctx context.Context, ticker string, body map[string]string) error
 	UpdateTxnHash(ctx context.Context, ticker string, txnHash string) error
 	FetchAll(ctx context.Context, skip int) ([]TokenData, error)
 	Buy(ctx context.Context, orderData OrderData) error
@@ -122,6 +123,16 @@ func (r repo) UpdateTxnHash(ctx context.Context, ticker string, txnHash string) 
 			"txnHash": txnHash,
 		}}
 	_, err := collection.UpdateOne(context.TODO(), filter, update)
+	return err
+}
+
+func (r repo) UpdateToken(ctx context.Context, ticker string, body map[string]string) error {
+	collection := r.dbClient.Database("Assets").Collection("tokens")
+	updateBody := bson.M{}
+	for k, v := range body {
+		updateBody[k] = v
+	}
+	_, err := collection.UpdateOne(ctx, bson.M{"ticker": bson.M{"$eq": ticker}}, updateBody)
 	return err
 }
 
