@@ -18,6 +18,7 @@ type Endpoints struct {
 	fetchQuoteEndpoint      endpoint.Endpoint
 	fetchBalanceEndpoint    endpoint.Endpoint
 	fetchOwnerEndpoint      endpoint.Endpoint
+	fetchReceiptEndpoint    endpoint.Endpoint
 }
 
 func newEndpoints(s TokenDataService) Endpoints {
@@ -33,6 +34,7 @@ func newEndpoints(s TokenDataService) Endpoints {
 		fetchQuoteEndpoint:      makefetchQuoteEndpoint(s),
 		fetchBalanceEndpoint:    makefetchBalanceEndpoint(s),
 		fetchOwnerEndpoint:      makefetchOwnerEndpoint(s),
+		fetchReceiptEndpoint:    makefetchReceiptEndpoint(s),
 	}
 
 }
@@ -221,4 +223,24 @@ func makefetchOwnerEndpoint(s TokenDataService) endpoint.Endpoint {
 			Data:    dataList,
 		}, err
 	}
+}
+
+func makefetchReceiptEndpoint(s TokenDataService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(ReceiptReq)
+		if !ok {
+			return nil, &GenericError{
+				Code:    400,
+				Message: "Bad Request",
+			}
+		}
+		dataList, err := s.FetchRecipt(ctx, req.TxnHash)
+		success := err == nil
+		return Response{
+			Success: success,
+			Data:    dataList,
+		}, err
+
+	}
+
 }

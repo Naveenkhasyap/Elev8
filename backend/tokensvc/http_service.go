@@ -92,6 +92,13 @@ func NewHTTPServer(srv TokenDataService) http.Handler {
 		httptransport.EncodeJSONResponse,
 		serverOptions...,
 	))
+
+	r.Methods("POST").Path("/token/v1/poll").Handler(httptransport.NewServer(
+		endpoints.fetchReceiptEndpoint,
+		DecodeRequest[ReceiptReq],
+		httptransport.EncodeJSONResponse,
+		serverOptions...,
+	))
 	return r
 }
 

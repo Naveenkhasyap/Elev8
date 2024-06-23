@@ -179,11 +179,13 @@ func (r *repo) FetchAllValid(ctx context.Context) ([]TokenData, error) {
 	collection := r.dbClient.Database("Assets").Collection("tokens")
 	var tokenData []TokenData
 
+	opt := options.Find()
+	opt = opt.SetSort(bson.M{"_id": -1})
 	cursor, err := collection.Find(ctx, bson.M{"$or": bson.A{
 		bson.M{"status": string(rpc.BlockStatus_AcceptedOnL1)},
 		bson.M{"status": string(rpc.BlockStatus_AcceptedOnL2)},
 		bson.M{"status": "RECEIVED"},
-	}})
+	}}, opt)
 
 	if err != nil {
 		return []TokenData{}, err

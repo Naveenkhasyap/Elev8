@@ -86,8 +86,17 @@ type BalaceReq struct {
 	TokenAddress string `json:"tokenAddress" bson:"tokenAddress"`
 }
 
+type ReceiptReq struct {
+	TxnHash string `json:"txnHash" bson:"txnHash"`
+}
+
+type ReceiptResp struct {
+	TokenAddress string `json:"tokenAddress" bson:"tokenAddress"`
+	Ticker       string `json:"ticker" bson:"ticker"`
+}
+
 type DecodeTypes interface {
-	TickerReq | CreateTokenReq | TokensListRequest | BuySellTokenReq | OrderDataReq | QuoteReq | BalaceReq | OwnerReq
+	TickerReq | CreateTokenReq | ReceiptReq | TokensListRequest | BuySellTokenReq | OrderDataReq | QuoteReq | BalaceReq | OwnerReq
 }
 
 func decodeTokensListRequest(vars map[string]string) (any, error) {

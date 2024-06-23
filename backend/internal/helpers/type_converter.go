@@ -3,7 +3,9 @@ package helpers
 import (
 	"encoding/hex"
 	"fmt"
+	"log"
 	"regexp"
+	"strings"
 
 	"github.com/NethermindEth/juno/core/felt"
 	"github.com/NethermindEth/starknet.go/utils"
@@ -54,4 +56,17 @@ func StringToHex(s string) string {
 	bytes := []byte(s)
 	hexString := hex.EncodeToString(bytes)
 	return hexString
+}
+
+func HexToString(s string) string {
+	// Decode the hexadecimal string to bytes
+	bytes, err := hex.DecodeString(strings.TrimPrefix(s, "0x"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Convert the byte slice to a string
+	asciiString := string(bytes)
+
+	return asciiString
 }

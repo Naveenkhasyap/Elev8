@@ -14,6 +14,7 @@ import (
 	"github.com/avast/retry-go"
 	starkrpc "github.com/gofiles/internal/clients/stark_rpc"
 	"github.com/gofiles/internal/contracts"
+	"github.com/gofiles/internal/helpers"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -31,6 +32,7 @@ type TokenDataService interface {
 	FetchBalance(ctx context.Context, tokenAddress string) (string, error)
 	FetchOwner(ctx context.Context, tokenAddress string) (string, error)
 	FetchQuote(ctx context.Context, tokenAddress string, amount string) (string, error)
+	FetchRecipt(ctx context.Context, txnHash string) (ReceiptResp, error)
 }
 
 type tokenDatasvc struct {
@@ -356,4 +358,27 @@ func (svc tokenDatasvc) getTransactionStatusRetry(ctx context.Context, txnHash *
 		return nil
 	}, retry.Delay(1*time.Second), retry.Attempts(5))
 	return out, nil
+}
+
+func (svc tokenDatasvc) FetchRecipt(ctx context.Context, txnHash string) (ReceiptResp, error) {
+	var receiptResp = ReceiptResp{}
+	hash, err := utils.HexToFelt(txnHash)
+	if err != nil {
+		panic(err)
+	}
+	resp, err := svc.client.WaitForTransaction(ctx, hash)
+	if err != nil {
+		return ReceiptResp{}, err
+	}
+
+	for _, val := range resp.Result.Events {
+		if len(val.Keys) == 2 && len(val.Data) == 1 {
+			receiptResp.TokenAddress = fmt.Sprintf("%s", val.Data[0])
+		}
+		if len(val.Data) == 16 {
+			receiptResp.Ticker = helpers.HexToString(fmt.Sprintf("%s", val.Data[6]))
+		}
+	}
+
+	return receiptResp, nil
 }

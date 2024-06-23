@@ -3,6 +3,7 @@ module github.com/gofiles
 go 1.21.7
 
 require (
+	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/go-playground/validator v9.31.0+incompatible
 	go.mongodb.org/mongo-driver v1.15.1
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
@@ -40,7 +41,6 @@ require (
 )
 
 require (
-	github.com/avast/retry-go v3.0.0+incompatible // indirect
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

@@ -45,7 +45,11 @@ type DataPoint struct {
 	Close  float64 `json:"close"`
 	Volume float64 `json:"volume"`
 }
-
+type ReceiptEvent struct {
+	From string   `json:"from_address" bson:"from_address"`
+	Keys []string `json:"keys" bson:"keys"`
+	Data []string `json:"data" bson:"data"`
+}
 type GenericError struct {
 	Code    int
 	Message string
