@@ -45,7 +45,6 @@ const CryptoDetail: React.FC = () => {
   };
 
   useEffect(() => {
-
     fetchData();
   }, []);
 
@@ -90,11 +89,25 @@ const CryptoDetail: React.FC = () => {
   }
 
   const data = {
-    labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+    labels: [
+      "00:00",
+      "01:00",
+      "02:00",
+      "03:00",
+      "04:00",
+      "05:00",
+      "06:00",
+      "07:00",
+      "08:00",
+      "09:00",
+      "10:00",
+      "11:00",
+      "12:00",
+    ],
     datasets: [
       {
         label: "Price",
-        data: [100, 150, 120, 180, 200, 190, 210, 220],
+        data: [10, 20, 20, 30, 5, 19, 10, 5, 4, 4, 3],
         borderColor: "rgba(75, 192, 192, 1)",
         tension: 0.1,
       },
